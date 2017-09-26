@@ -3,7 +3,7 @@
 namespace SleepingOwl\Admin\Form\Buttons;
 
 /**
- * Class Destroy.
+ * Class Save.
  */
 class Destroy extends FormButton
 {
@@ -17,12 +17,12 @@ class Destroy extends FormButton
     }
 
     /**
-     * Init Destroy Button.
+     * Init Cancel Button.
      */
     public function initialize()
     {
         parent::initialize();
-        $this->setHtmlAttributes($this->getHtmlAttributes() + [
+        $this->setHtmlAttributes([
             'type'  => 'submit',
             'name'  => 'next_action',
             'class' => 'btn btn-danger',

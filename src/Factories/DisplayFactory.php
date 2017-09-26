@@ -10,13 +10,14 @@ use SleepingOwl\Admin\Display\DisplayTable;
 use Illuminate\Contracts\Support\Renderable;
 use SleepingOwl\Admin\Display\DisplayTabbed;
 use Illuminate\Contracts\Foundation\Application;
+use SleepingOwl\Admin\Display\DisplayDatatables;
 use SleepingOwl\Admin\Display\DisplayDatatablesAsync;
 use SleepingOwl\Admin\Contracts\Display\DisplayFactoryInterface;
 
 /**
- * @method DisplayDatatablesAsync datatables()
+ * @method DisplayDatatables datatables()
  * @method DisplayDatatablesAsync datatablesAsync()
- * @method DisplayTab tab(Renderable $display, $label = null, $icon = null)
+ * @method DisplayTab tab(Renderable $display)
  * @method DisplayTabbed tabbed(\Closure|array $tabs = null)
  * @method DisplayTable table()
  * @method DisplayTree tree()
@@ -34,7 +35,7 @@ class DisplayFactory extends AliasBinder implements DisplayFactoryInterface
         parent::__construct($application);
 
         $this->register([
-            'datatables' => DisplayDatatablesAsync::class,
+            'datatables' => DisplayDatatables::class,
             'datatablesAsync' => DisplayDatatablesAsync::class,
             'tab' => DisplayTab::class,
             'tabbed' => DisplayTabbed::class,

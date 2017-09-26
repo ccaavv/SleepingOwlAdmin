@@ -3,7 +3,6 @@
 namespace SleepingOwl\Admin\Display\Column;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
 use SleepingOwl\Admin\Display\TableColumn;
 use Illuminate\Database\Eloquent\Collection;
@@ -13,6 +12,26 @@ use SleepingOwl\Admin\Contracts\Display\OrderByClauseInterface;
 
 abstract class NamedColumn extends TableColumn implements NamedColumnInterface
 {
+    /**
+     * @var \Closure
+     */
+    protected $searchCallback = null;
+
+    /**
+     * @var \Closure
+     */
+    protected $orderCallback = null;
+
+    /**
+     * @var \Closure
+     */
+    protected $filterCallback = null;
+
+    /**
+     * @var null
+     */
+    protected $columMetaClass = null;
+
     /**
      * Column field name.
      * @var string
@@ -28,11 +47,10 @@ abstract class NamedColumn extends TableColumn implements NamedColumnInterface
      * @param Closure|null|string $name
      * @param null|string $label
      */
-    public function __construct($name, $label = null, $small = null)
+    public function __construct($name, $label = null)
     {
         parent::__construct($label);
         $this->setName($name);
-        $this->setSmall($small);
 
         $this->setHtmlAttribute('class', 'row-'.strtolower(class_basename(get_called_class())));
 
@@ -62,23 +80,81 @@ abstract class NamedColumn extends TableColumn implements NamedColumnInterface
     }
 
     /**
-     * @return string
+     * @param $columnMetaClass
+     * @return $this
      */
-    public function getSmall()
+    public function setMetaData($columnMetaClass)
     {
-        return $this->small;
+        $this->columMetaClass = $columnMetaClass;
+
+        return $this;
     }
 
     /**
-     * @param string $small
-     *
+     * @return mixed
+     */
+    public function getMetaData()
+    {
+        return $this->columMetaClass
+            ? app()->make($this->columMetaClass)
+            : false;
+    }
+
+    /**
+     * @param \Closure $callable
      * @return $this
      */
-    public function setSmall($small)
+    public function setOrderCallback(\Closure $callable)
     {
-        $this->small = $small;
+        $this->orderCallback = $callable;
+
+        return $this->setOrderable($callable);
+    }
+
+    /**
+     * @param \Closure $callable
+     * @return $this
+     */
+    public function setSearchCallback(\Closure $callable)
+    {
+        $this->searchCallback = $callable;
 
         return $this;
+    }
+
+    /**
+     * @param \Closure $callable
+     * @return $this
+     */
+    public function setFilterCallback(\Closure $callable)
+    {
+        $this->filterCallback = $callable;
+
+        return $this;
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function getOrderCallback()
+    {
+        return $this->orderCallback;
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function getSearchCallback()
+    {
+        return $this->searchCallback;
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function getFilterCallback()
+    {
+        return $this->filterCallback;
     }
 
     /**
@@ -90,17 +166,9 @@ abstract class NamedColumn extends TableColumn implements NamedColumnInterface
     }
 
     /**
-     * @return mixed
-     */
-    public function getModelSmallValue()
-    {
-        return $this->getValueFromObject($this->getModel(), $this->getSmall());
-    }
-
-    /**
      * @param OrderByClauseInterface|bool $orderable
      * @deprecated
-     * @return TableColumn
+     * @return $this
      */
     public function setOrderable($orderable = true)
     {
@@ -139,26 +207,6 @@ abstract class NamedColumn extends TableColumn implements NamedColumnInterface
             return $name($instance);
         }
 
-        /*
-         * Implement json parsing
-         */
-        if (strpos($name, '.') === false && strpos($name, '->') !== false) {
-            $casts = collect($instance->getCasts());
-            $jsonParts = collect(explode('->', $name));
-
-            $jsonAttr = $instance->{$jsonParts->first()};
-
-            $cast = $casts->get($jsonParts->first(), false);
-
-            if ($cast == 'object') {
-                $jsonAttr = json_decode(json_encode($jsonAttr), true);
-            } elseif ($cast != 'array') {
-                $jsonAttr = json_decode($jsonAttr);
-            }
-
-            return Arr::get($jsonAttr, $jsonParts->slice(1)->implode('.'));
-        }
-
         $parts = explode('.', $name);
         $part = array_shift($parts);
 
@@ -170,7 +218,7 @@ abstract class NamedColumn extends TableColumn implements NamedColumnInterface
                 $instance = $instance->pluck($part);
             }
 
-            if ($instance === null) {
+            if ($instance == null) {
                 $instance = collect();
             }
         } elseif (! is_null($instance)) {

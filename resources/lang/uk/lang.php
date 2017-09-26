@@ -87,7 +87,6 @@ return [
     'select' => [
         'nothing' => 'Нічого не вибрано',
         'selected' => 'вибрано',
-        'no_items'    => 'Нема шо вибрать',
         'placeholder' => 'Виберіть зі списку',
     ],
     'image' => [

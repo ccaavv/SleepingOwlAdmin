@@ -3,7 +3,7 @@
 namespace SleepingOwl\Admin\Templates;
 
 use DaveJamesMiller\Breadcrumbs\Manager as BreadcrumbsManager;
-use SleepingOwl\Admin\Contracts\Template\BreadcrumbsInterface as BreadcrumbsContract;
+use SleepingOwl\Admin\Contracts\Template\Breadcrumbs as BreadcrumbsContract;
 
 class Breadcrumbs extends BreadcrumbsManager implements BreadcrumbsContract
 {
@@ -31,8 +31,7 @@ class Breadcrumbs extends BreadcrumbsManager implements BreadcrumbsContract
     public function renderIfExists($name = null)
     {
         if (is_null($name)) {
-            $params = $this->currentRoute->get();
-            $name = $params[0];
+            list($name, $params) = $this->currentRoute->get();
         }
 
         if (! $this->exists($name)) {

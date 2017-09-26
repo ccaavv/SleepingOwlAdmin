@@ -3,8 +3,8 @@
         @if($iconClass)<i class="fa {{ $iconClass }}"></i>@endif {{$text}}
     </button>
 @else
-    <a href="{{$url}}" {!! $attributes !!}>
-        @if($iconClass)<i class="fa {{$iconClass}}"></i>@endif {{ $text }}
+    <a href="{{$url}}" class="btn btn-link">
+        <i class="fa {{$iconClass}}"></i> {{ $text }}
     </a>
 @endif
 @if($groupElements)

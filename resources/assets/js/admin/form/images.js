@@ -57,7 +57,7 @@ Vue.component('element-images', Vue.extend({
                 },
                 error (file, response) {
                     if(_.isArray(response.errors)) {
-                        self.errors = response.errors;
+                        self.$set(self.errors, response.errors);
                     }
                 },
                 complete(){
@@ -72,13 +72,14 @@ Vue.component('element-images', Vue.extend({
             let self = this;
 
             Admin.Messages.confirm(trans('lang.message.are_you_sure')).then(() => {
-                self.vals = _.filter(self.vals, function (img, key) {
+                self.$set('values', _.filter(self.vals, function (img, key) {
+
                     return image !== key
-                });
+                }));
             });
         },
         closeAlert () {
-            this.errors = [];
+            this.$set(this.errors, []);
         }
     },
     computed: {

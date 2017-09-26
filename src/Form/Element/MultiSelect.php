@@ -25,7 +25,7 @@ class MultiSelect extends Select
     /**
      * @var string
      */
-    protected $view = 'form.element.multiselect';
+    protected $view = 'form.element.select';
 
     /**
      * @return string
@@ -41,13 +41,6 @@ class MultiSelect extends Select
     public function getValueFromModel()
     {
         $value = parent::getValueFromModel();
-
-        if (is_array($value)) {
-            foreach ($value as $key => $val) {
-                $value[$key] = $val;
-            }
-        }
-
         if ($value instanceof Collection && $value->count() > 0) {
             $value = $value->pluck($value->first()->getKeyName())->all();
         }
@@ -121,7 +114,7 @@ class MultiSelect extends Select
     {
         $this->setHtmlAttributes([
             'id'    => $this->getName(),
-            'class' => 'form-control',
+            'class' => 'form-control input-select',
             'multiple',
         ]);
 
@@ -135,7 +128,7 @@ class MultiSelect extends Select
 
         return [
                 'tagable'    => $this->isTaggable(),
-                'attributes' => $this->htmlAttributesToString(),
+                'attributes' => $this->getHtmlAttributes(),
             ] + parent::toArray();
     }
 
@@ -195,7 +188,7 @@ class MultiSelect extends Select
         array $values
     ) {
         foreach ($values as $i => $value) {
-            if (! array_key_exists($value, $this->getOptions()) && $this->isTaggable()) {
+            if (! array_key_exists($value, $this->getOptions()) and $this->isTaggable()) {
                 $model = clone $this->getModelForOptions();
                 $model->{$this->getDisplay()} = $value;
                 $model->save();

@@ -1,18 +1,12 @@
-@yield('before.panel')
-
 <div class="panel panel-default">
     <div class="panel-heading">
         @if ($creatable)
-            <a class="btn btn-primary" href="{{ $createUrl }}">
+            <a class="btn btn-xs btn-primary" href="{{ $createUrl }}">
                 <i class="fa fa-plus"></i> {{ $newEntryButtonText }}
             </a>
         @endif
-        @yield('panel.buttons')
-        <div class="pull-right">
-            @yield('panel.heading.actions')
-        </div>
     </div>
-    @yield('panel.heading')
+
     @if($max_depth > 1)
         <menu id="nestable-menu" class="panel-heading no-margin">
             <button type="button" data-action="expand-all"
@@ -28,6 +22,5 @@
             </ol>
         </div>
     </div>
-    @yield('panel.footer')
 </div>
-@yield('after.panel')
+

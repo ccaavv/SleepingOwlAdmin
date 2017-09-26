@@ -4,7 +4,7 @@ namespace SleepingOwl\Admin\Contracts\Display\Extension;
 
 use Illuminate\Database\Eloquent\Builder;
 use SleepingOwl\Admin\Contracts\Initializable;
-use SleepingOwl\Admin\Contracts\Display\ColumnInterface;
+use SleepingOwl\Admin\Contracts\Display\NamedColumnInterface;
 
 interface ColumnFilterInterface extends Initializable
 {
@@ -16,12 +16,12 @@ interface ColumnFilterInterface extends Initializable
     public function parseValue($value);
 
     /**
-     * @param ColumnInterface $column
+     * @param NamedColumnInterface $column
      * @param Builder $query
      * @param string $queryString
      * @param array|string $queryParams
      *
      * @return void
      */
-    public function apply(ColumnInterface $column, Builder $query, $queryString, $queryParams);
+    public function apply(NamedColumnInterface $column, Builder $query, $queryString, $queryParams);
 }

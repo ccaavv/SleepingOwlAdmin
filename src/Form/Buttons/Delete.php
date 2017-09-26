@@ -3,7 +3,7 @@
 namespace SleepingOwl\Admin\Form\Buttons;
 
 /**
- * Class Delete.
+ * Class Save.
  */
 class Delete extends FormButton
 {
@@ -17,13 +17,12 @@ class Delete extends FormButton
     }
 
     /**
-     * Init Delete Button.
+     * Init Cancel Button.
      */
     public function initialize()
     {
         parent::initialize();
-
-        $this->setHtmlAttributes($this->getHtmlAttributes() + [
+        $this->setHtmlAttributes([
             'name'          => 'next_action',
             'class'         => 'btn btn-danger btn-delete',
             'data-url'      => $this->getModelConfiguration()->getDeleteUrl($this->getModel()->getKey()),
@@ -37,12 +36,12 @@ class Delete extends FormButton
      */
     public function canShow()
     {
-        if (is_null($this->getModel()->getKey())) {
+        if (is_null($this->getModel()->getKey()) || ! $this->show) {
+        	$this->show = false;
             return false;
         }
 
         $this->show = ! $this->isTrashed() && $this->getModelConfiguration()->isDeletable($this->getModel());
-
-        return parent::canShow();
+        parent::canShow();
     }
 }

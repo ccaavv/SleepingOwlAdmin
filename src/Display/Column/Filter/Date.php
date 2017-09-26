@@ -4,11 +4,10 @@ namespace SleepingOwl\Admin\Display\Column\Filter;
 
 use Exception;
 use Carbon\Carbon;
-use SleepingOwl\Admin\Traits\DatePicker;
 
 class Date extends Text
 {
-    use DatePicker;
+    use \SleepingOwl\Admin\Traits\DatePicker;
 
     /**
      * @var string

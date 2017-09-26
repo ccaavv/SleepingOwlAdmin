@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use SleepingOwl\Admin\Form\FormElements;
-use SleepingOwl\Admin\Display\DisplayTab;
 use SleepingOwl\Admin\Display\DisplayTree;
 use SleepingOwl\Admin\Form\Columns\Column;
 use SleepingOwl\Admin\Display\DisplayTabbed;
@@ -86,7 +85,7 @@ class DisplayController extends Controller
         $display = $model->fireDisplay();
 
         if ($display instanceof DisplayTabbed) {
-            $display->getTabs()->each(function (DisplayTab $tab) use ($request) {
+            $display->getTabs()->each(function ($tab) use ($request) {
                 $content = $tab->getContent();
                 if ($content instanceof DisplayTree) {
                     $content->getRepository()->reorder(

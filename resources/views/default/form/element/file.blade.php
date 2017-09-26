@@ -39,7 +39,7 @@
 							<i class="fa fa-cloud-download"></i>
 						</a>
 
-						<button type="button"  v-if="has_value" class="btn btn-danger btn-xs"
+						<button v-if="has_value" class="btn btn-danger btn-xs" @keyup.enter="return false;"
 								@click.prevent="remove()">
 							<i class="fa fa-times"></i> {{ trans('sleeping_owl::lang.image.remove') }}
 						</button>

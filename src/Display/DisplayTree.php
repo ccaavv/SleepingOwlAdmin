@@ -1,382 +1,375 @@
 <?php
 
-namespace SleepingOwl\Admin\Display;
+	namespace SleepingOwl\Admin\Display;
 
-use Request;
-use Illuminate\Routing\Router;
-use Illuminate\Database\Eloquent\Collection;
-use SleepingOwl\Admin\Display\Tree\OrderTreeType;
-use SleepingOwl\Admin\Repositories\TreeRepository;
-use SleepingOwl\Admin\Contracts\WithRoutesInterface;
-use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
-use SleepingOwl\Admin\Contracts\Repositories\TreeRepositoryInterface;
+	use Request;
+	use Illuminate\Routing\Router;
+	use Illuminate\Database\Eloquent\Collection;
+	use SleepingOwl\Admin\Display\Tree\OrderTreeType;
+	use SleepingOwl\Admin\Repositories\TreeRepository;
+	use SleepingOwl\Admin\Contracts\WithRoutesInterface;
+	use SleepingOwl\Admin\Contracts\ModelConfigurationInterface;
+	use SleepingOwl\Admin\Contracts\Repositories\TreeRepositoryInterface;
 
-/**
- * @method TreeRepositoryInterface getRepository()
- * @property TreeRepositoryInterface $repository
- */
-class DisplayTree extends Display implements WithRoutesInterface
-{
-    /**
-     * @param Router $router
-     */
-    public static function registerRoutes(Router $router)
-    {
-        $routeName = 'admin.display.tree.reorder';
-        if (! $router->has($routeName)) {
-            $router->post('{adminModel}/reorder',
-                ['as' => $routeName, 'uses' => 'SleepingOwl\Admin\Http\Controllers\DisplayController@treeReorder']);
-        }
-    }
+	/**
+	 * @method TreeRepositoryInterface getRepository()
+	 * @property TreeRepositoryInterface $repository
+	 */
+	class DisplayTree extends Display implements WithRoutesInterface
+	{
+		/**
+		 * @param Router $router
+		 */
+		public static function registerRoutes(Router $router)
+		{
+			$routeName = 'admin.display.tree.reorder';
+			if (!$router->has($routeName)) {
+				$router->post('{adminModel}/reorder',
+					['as' => $routeName,
+					 'uses' => 'SleepingOwl\Admin\Http\Controllers\DisplayController@treeReorder']);
+			}
+		}
 
-    /**
-     * @var int
-     */
-    protected $max_depth = 20;
-    /**
-     * @var string
-     */
-    protected $view = 'display.tree';
+		/**
+		 * @var int
+		 */
+		protected $max_depth = 20;
+		/**
+		 * @var string
+		 */
+		protected $view = 'display.tree';
 
-    /**
-     * @var array
-     */
-    protected $parameters = [];
+		/**
+		 * @var array
+		 */
+		protected $parameters = [];
 
-    /**
-     * @var bool
-     */
-    protected $reorderable = true;
+		/**
+		 * @var bool
+		 */
+		protected $reorderable = true;
 
-    /**
-     * @var string|callable
-     */
-    protected $value = 'title';
+		/**
+		 * @var string|callable
+		 */
+		protected $value = 'title';
 
-    /**
-     * @var string
-     */
-    protected $parentField = 'parent_id';
+		/**
+		 * @var string
+		 */
+		protected $parentField = 'parent_id';
 
-    /**
-     * @var string
-     */
-    protected $orderField = 'order';
+		/**
+		 * @var string
+		 */
+		protected $orderField = 'order';
 
-    /**
-     * @var string|null
-     */
-    protected $rootParentId = null;
+		/**
+		 * @var string|null
+		 */
+		protected $rootParentId = null;
 
-    /**
-     * @var string
-     */
-    protected $repositoryClass = TreeRepository::class;
+		/**
+		 * @var string
+		 */
+		protected $repositoryClass = TreeRepository::class;
 
-    /**
-     * @var Column\TreeControl
-     */
-    protected $controlColumn;
+		/**
+		 * @var Column\TreeControl
+		 */
+		protected $controlColumn;
 
-    /**
-     * @var Collection
-     */
-    protected $collection;
+		/**
+		 * @var Collection
+		 */
+		protected $collection;
 
-    /**
-     * @var string|null
-     */
-    protected $newEntryButtonText;
+		/**
+		 * @var string|null
+		 */
+		protected $newEntryButtonText;
 
-    /**
-     * @var string
-     */
-    protected $treeType;
+		/**
+		 * @var string
+		 */
+		protected $treeType;
 
-    /**
-     * DisplayTree constructor.
-     *
-     * @param string|null $treeType
-     */
-    public function __construct($treeType = null)
-    {
-        parent::__construct();
+		/**
+		 * DisplayTree constructor.
+		 *
+		 * @param string|null $treeType
+		 */
+		public function __construct($treeType = null)
+		{
+			parent::__construct();
+			// TODO: move tree building to extension
+			// $this->extend('tree', new Tree());
+			$this->treeType = $treeType;
+		}
 
-        $this->treeType = $treeType;
-    }
+		public function initialize()
+		{
+			parent::initialize();
+			$repository = $this->getRepository()
+				->setOrderField($this->getOrderField())
+				->setRootParentId($this->getRootParentId());
+			if ($this->getParentField()) {
+				$repository = $repository->setParentField($this->getParentField());
+			}
+			if (!is_null($this->treeType)) {
+				$repository->setTreeType($this->treeType);
+			}
+			if ($this->treeType == OrderTreeType::class) {
+				$this->setMaxDepth(1);
+			}
+			$this->setHtmlAttribute('data-max-depth', $this->getMaxDepth());
+		}
 
-    public function initialize()
-    {
-        parent::initialize();
+		/**
+		 * @return string
+		 */
+		public function getMaxDepth()
+		{
+			return $this->max_depth;
+		}
 
-        $repository = $this->getRepository()
-            ->setOrderField($this->getOrderField())
-            ->setRootParentId($this->getRootParentId());
+		/**
+		 * @param string|callable $value
+		 *
+		 * @return $this
+		 */
+		public function setMaxDepth($value)
+		{
+			$this->max_depth = $value;
 
-        if ($this->getParentField()) {
-            $repository = $repository->setParentField($this->getParentField());
-        }
-        if (! is_null($this->treeType)) {
-            $repository->setTreeType($this->treeType);
-        }
+			return $this;
+		}
 
-        if ($this->treeType == OrderTreeType::class) {
-            $this->setMaxDepth(1);
-        }
+		/**
+		 * @return string
+		 */
+		public function getValue()
+		{
+			return $this->value;
+		}
 
-        $this->setHtmlAttribute('data-max-depth', $this->getMaxDepth());
-    }
+		/**
+		 * @param string|callable $value
+		 *
+		 * @return $this
+		 */
+		public function setValue($value)
+		{
+			$this->value = $value;
 
-    /**
-     * @return string
-     */
-    public function getMaxDepth()
-    {
-        return $this->max_depth;
-    }
+			return $this;
+		}
 
-    /**
-     * @param string|callable $value
-     *
-     * @return $this
-     */
-    public function setMaxDepth($value)
-    {
-        $this->max_depth = $value;
+		/**
+		 * @return string
+		 */
+		public function getParentField()
+		{
+			return $this->parentField;
+		}
 
-        return $this;
-    }
+		/**
+		 * @param string $parentField
+		 *
+		 * @return $this
+		 */
+		public function setParentField($parentField)
+		{
+			$this->parentField = $parentField;
 
-    /**
-     * @return string
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
+			return $this;
+		}
 
-    /**
-     * @param string|callable $value
-     *
-     * @return $this
-     */
-    public function setValue($value)
-    {
-        $this->value = $value;
+		/**
+		 * @return null|string
+		 */
+		public function getNewEntryButtonText()
+		{
+			if (is_null($this->newEntryButtonText)) {
+				$this->newEntryButtonText = trans('sleeping_owl::lang.table.new-entry');
+			}
 
-        return $this;
-    }
+			return $this->newEntryButtonText;
+		}
 
-    /**
-     * @return string
-     */
-    public function getParentField()
-    {
-        return $this->parentField;
-    }
+		/**
+		 * @param string $newEntryButtonText
+		 *
+		 * @return $this
+		 */
+		public function setNewEntryButtonText($newEntryButtonText)
+		{
+			$this->newEntryButtonText = $newEntryButtonText;
 
-    /**
-     * @param string $parentField
-     *
-     * @return $this
-     */
-    public function setParentField($parentField)
-    {
-        $this->parentField = $parentField;
+			return $this;
+		}
 
-        return $this;
-    }
+		/**
+		 * @return string
+		 */
+		public function getOrderField()
+		{
+			return $this->orderField;
+		}
 
-    /**
-     * @return null|string
-     */
-    public function getNewEntryButtonText()
-    {
-        if (is_null($this->newEntryButtonText)) {
-            $this->newEntryButtonText = trans('sleeping_owl::lang.table.new-entry');
-        }
+		/**
+		 * @param string $orderField
+		 *
+		 * @return $this
+		 */
+		public function setOrderField($orderField)
+		{
+			$this->orderField = $orderField;
 
-        return $this->newEntryButtonText;
-    }
+			return $this;
+		}
 
-    /**
-     * @param string $newEntryButtonText
-     *
-     * @return $this
-     */
-    public function setNewEntryButtonText($newEntryButtonText)
-    {
-        $this->newEntryButtonText = $newEntryButtonText;
+		/**
+		 * @return null|string
+		 */
+		public function getRootParentId()
+		{
+			return $this->rootParentId;
+		}
 
-        return $this;
-    }
+		/**
+		 * @param null|string $rootParentId
+		 *
+		 * @return $this
+		 */
+		public function setRootParentId($rootParentId)
+		{
+			$this->rootParentId = $rootParentId;
 
-    /**
-     * @return string
-     */
-    public function getOrderField()
-    {
-        return $this->orderField;
-    }
+			return $this;
+		}
 
-    /**
-     * @param string $orderField
-     *
-     * @return $this
-     */
-    public function setOrderField($orderField)
-    {
-        $this->orderField = $orderField;
+		/**
+		 * @return array
+		 */
+		public function getParameters()
+		{
+			return $this->parameters;
+		}
 
-        return $this;
-    }
+		/**
+		 * @param array $parameters
+		 *
+		 * @return $this
+		 */
+		public function setParameters($parameters)
+		{
+			$this->parameters = $parameters;
 
-    /**
-     * @return null|string
-     */
-    public function getRootParentId()
-    {
-        return $this->rootParentId;
-    }
+			return $this;
+		}
 
-    /**
-     * @param null|string $rootParentId
-     *
-     * @return $this
-     */
-    public function setRootParentId($rootParentId)
-    {
-        $this->rootParentId = $rootParentId;
+		/**
+		 * @param string $key
+		 * @param mixed  $value
+		 *
+		 * @return $this
+		 */
+		public function setParameter($key, $value)
+		{
+			$this->parameters[$key] = $value;
 
-        return $this;
-    }
+			return $this;
+		}
 
-    /**
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
+		/**
+		 * @return bool
+		 */
+		public function isReorderable()
+		{
+			return $this->reorderable;
+		}
 
-    /**
-     * @param array $parameters
-     *
-     * @return $this
-     */
-    public function setParameters($parameters)
-    {
-        $this->parameters = $parameters;
+		/**
+		 * @param bool $reorderable
+		 *
+		 * @return $this
+		 */
+		public function setReorderable($reorderable)
+		{
+			$this->reorderable = (bool)$reorderable;
 
-        return $this;
-    }
+			return $this;
+		}
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     *
-     * @return $this
-     */
-    public function setParameter($key, $value)
-    {
-        $this->parameters[$key] = $value;
+		/**
+		 * @return array
+		 */
+		public function toArray()
+		{
+			$model = $this->getModelConfiguration();
 
-        return $this;
-    }
+			return parent::toArray() + [
+					'items'              => $this->getRepository()->getTree($this->getCollection()),
+					'reorderable'        => $this->isReorderable(),
+					'url'                => $model->getDisplayUrl(),
+					'value'              => $this->getValue(),
+					'creatable'          => $model->isCreatable(),
+					'createUrl'          => $model->getCreateUrl($this->getParameters() + Request::all()),
+					'controls'           => [app('sleeping_owl.table.column')->treeControl()],
+					'newEntryButtonText' => $this->getNewEntryButtonText(),
+					'max_depth'          => $this->getMaxDepth(),
+				];
+		}
 
-    /**
-     * @return bool
-     */
-    public function isReorderable()
-    {
-        return $this->reorderable;
-    }
+		/**
+		 * @return ModelConfigurationInterface
+		 */
+		protected function getModelConfiguration()
+		{
+			return app('sleeping_owl')->getModel($this->modelClass);
+		}
 
-    /**
-     * @param bool $reorderable
-     *
-     * @return $this
-     */
-    public function setReorderable($reorderable)
-    {
-        $this->reorderable = (bool) $reorderable;
+		/**
+		 * @return Collection
+		 * @throws \Exception
+		 */
+		public function getCollection()
+		{
+			if (!$this->isInitialized()) {
+				throw new \Exception('Display is not initialized');
+			}
+			if (!is_null($this->collection)) {
+				return $this->collection;
+			}
+			$query = $this->getRepository()->getQuery();
+			$this->modifyQuery($query);
+			if (method_exists($query, 'defaultOrder')) {
+				return $query->defaultOrder()->get();
+			}
 
-        return $this;
-    }
+			return $query->get();
+		}
 
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        $model = $this->getModelConfiguration();
+		/**
+		 * @param \Illuminate\Database\Eloquent\Builder|Builder $query
+		 */
+		protected function modifyQuery(\Illuminate\Database\Eloquent\Builder $query)
+		{
+			$this->extensions->modifyQuery($query);
+		}
 
-        return parent::toArray() + [
-                'items'              => $this->getRepository()->getTree($this->getCollection()),
-                'reorderable'        => $this->isReorderable(),
-                'url'                => $model->getDisplayUrl(),
-                'value'              => $this->getValue(),
-                'creatable'          => $model->isCreatable(),
-                'createUrl'          => $model->getCreateUrl($this->getParameters() + Request::all()),
-                'controls'           => [app('sleeping_owl.table.column')->treeControl()],
-                'newEntryButtonText' => $this->getNewEntryButtonText(),
-                'max_depth'          => $this->getMaxDepth(),
-            ];
-    }
+		/**
+		 * @return \Illuminate\Foundation\Application|mixed
+		 * @throws \Exception
+		 */
+		protected function makeRepository()
+		{
+			$repository = parent::makeRepository();
+			if (!($repository instanceof TreeRepositoryInterface)) {
+				throw new \Exception('Repository class must be instanced of [TreeRepositoryInterface]');
+			}
 
-    /**
-     * @return ModelConfigurationInterface
-     */
-    protected function getModelConfiguration()
-    {
-        return app('sleeping_owl')->getModel($this->modelClass);
-    }
-
-    /**
-     * @return Collection
-     * @throws \Exception
-     */
-    public function getCollection()
-    {
-        if (! $this->isInitialized()) {
-            throw new \Exception('Display is not initialized');
-        }
-
-        if (! is_null($this->collection)) {
-            return $this->collection;
-        }
-
-        $query = $this->getRepository()->getQuery();
-
-        $this->modifyQuery($query);
-
-        if (method_exists($query, 'defaultOrder')) {
-            return $query->defaultOrder()->get();
-        }
-
-        return $query->get();
-    }
-
-    /**
-     * @param \Illuminate\Database\Eloquent\Builder|Builder $query
-     */
-    protected function modifyQuery(\Illuminate\Database\Eloquent\Builder $query)
-    {
-        $this->extensions->modifyQuery($query);
-    }
-
-    /**
-     * @return \Illuminate\Foundation\Application|mixed
-     * @throws \Exception
-     */
-    protected function makeRepository()
-    {
-        $repository = parent::makeRepository();
-
-        if (! ($repository instanceof TreeRepositoryInterface)) {
-            throw new \Exception('Repository class must be instanced of [TreeRepositoryInterface]');
-        }
-
-        return $repository;
-    }
-}
+			return $repository;
+		}
+	}

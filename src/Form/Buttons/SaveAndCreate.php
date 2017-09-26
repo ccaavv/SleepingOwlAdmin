@@ -4,7 +4,7 @@
 namespace SleepingOwl\Admin\Form\Buttons;
 
 /**
- * Class SaveAndCreate.
+ * Class Save.
  */
 class SaveAndCreate extends FormButton
 {
@@ -15,7 +15,7 @@ class SaveAndCreate extends FormButton
     public function __construct()
     {
         $this->setText(trans('sleeping_owl::lang.table.save_and_create'));
-        $this->setHtmlAttributes($this->getHtmlAttributes() + [
+        $this->setHtmlAttributes([
             'type'  => 'submit',
             'name'  => 'next_action',
             'class' => 'btn btn-info',
@@ -23,7 +23,7 @@ class SaveAndCreate extends FormButton
     }
 
     /**
-     * Init SaveAndCreate Button.
+     * Init Cancel Button.
      */
     public function initialize()
     {

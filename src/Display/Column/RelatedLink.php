@@ -25,16 +25,16 @@ class RelatedLink extends Link
      * @param \Closure|null|string $name
      * @param null|string $label
      */
-    public function __construct($name, $label = null, $small = null)
+    public function __construct($name, $label = null)
     {
-        parent::__construct($name, $label, $small);
+        parent::__construct($name, $label);
         $this->originalName = $name;
     }
 
     /**
      * @param Model $model
      *
-     * @return Link
+     * @return $this
      */
     public function setModel(Model $model)
     {

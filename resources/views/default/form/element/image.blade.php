@@ -9,6 +9,7 @@
 
 	@include(AdminTemplate::getViewPath('form.element.partials.helptext'))
 
+
 	<element-image
 			url="{{ route('admin.form.element.image', [
 				'adminModel' => AdminSection::getModel($model)->getAlias(),
@@ -38,7 +39,7 @@
 							<i class="fa fa-cloud-download"></i>
 						</a>
 
-						<button type="button" v-if="has_value && !readonly" class="btn btn-danger btn-xs" @click.prevent="remove()">
+						<button v-if="has_value && !readonly" class="btn btn-danger btn-xs" @click.prevent="remove()">
 							<i class="fa fa-times"></i> {{ trans('sleeping_owl::lang.image.remove') }}
 						</button>
 					</div>
@@ -61,4 +62,3 @@
 		@include(AdminTemplate::getViewPath('form.element.partials.errors'))
 	</div>
 </div>
-

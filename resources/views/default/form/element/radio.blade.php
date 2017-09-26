@@ -6,14 +6,11 @@
 			<span class="form-element-required">*</span>
 		@endif
 	</label>
-	@foreach ($options as $option)
+	@foreach ($options as $optionValue => $optionLabel)
 		<div class="radio">
 			<label>
-				<input {!! ($value == $option['id']) ? 'checked' : '' !!}
-					   {!! $htmlStringAttributes !!}
-					   value="{{ $option['id'] }}"
-				/>
-				{{$option['text']}}
+				<input {!! $htmlStringAttributes !!} value="{{ $optionValue }}" {!! ($value == $optionValue) ? 'checked' : '' !!}/>
+				{{ $optionLabel }}
 			</label>
 		</div>
 	@endforeach

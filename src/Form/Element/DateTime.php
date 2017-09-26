@@ -15,11 +15,6 @@ class DateTime extends NamedFormElement
     protected $format = 'Y-m-d H:i:s';
 
     /**
-     * @var string
-     */
-    protected $timezone;
-
-    /**
      * @var bool
      */
     protected $seconds = false;
@@ -38,18 +33,6 @@ class DateTime extends NamedFormElement
     }
 
     /**
-     * @return string
-     */
-    public function getTimezone()
-    {
-        if (is_null($this->timezone)) {
-            $this->timezone = config('sleeping_owl.timezone');
-        }
-
-        return $this->timezone;
-    }
-
-    /**
      * @param string|null $format
      *
      * @return $this
@@ -57,18 +40,6 @@ class DateTime extends NamedFormElement
     public function setFormat($format)
     {
         $this->format = $format;
-
-        return $this;
-    }
-
-    /**
-     * @param string $timezone
-     *
-     * @return $this
-     */
-    public function setTimezone($timezone)
-    {
-        $this->timezone = $timezone;
 
         return $this;
     }
@@ -112,8 +83,7 @@ class DateTime extends NamedFormElement
     public function setModelAttribute($value)
     {
         $value = ! empty($value)
-            ? Carbon::createFromFormat($this->getPickerFormat(), $value, $this->getTimezone())
-                    ->timezone(config('app.timezone'))->format($this->getFormat())
+            ? Carbon::createFromFormat($this->getPickerFormat(), $value)->format($this->getFormat())
             : null;
 
         parent::setModelAttribute($value);
@@ -155,7 +125,7 @@ class DateTime extends NamedFormElement
      */
     public function setCurrentDate()
     {
-        $this->defaultValue = Carbon::now()->timezone($this->getTimezone())->format($this->getFormat());
+        $this->defaultValue = Carbon::now()->format($this->getFormat());
 
         return $this;
     }
@@ -187,7 +157,7 @@ class DateTime extends NamedFormElement
             }
         }
 
-        return $time->timezone($this->getTimezone())->format(
+        return $time->format(
             $this->getPickerFormat()
         );
     }

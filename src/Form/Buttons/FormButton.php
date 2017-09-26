@@ -35,7 +35,7 @@ class FormButton implements FormButtonsInterface, Initializable
     /**
      * Show button.
      */
-    protected $show = true;
+    protected $show;
 
     /**
      * This is URL.
@@ -69,7 +69,7 @@ class FormButton implements FormButtonsInterface, Initializable
 
     public function canShow()
     {
-        return $this->show;
+        return true;
     }
 
     /**

@@ -5,7 +5,6 @@ namespace SleepingOwl\Admin\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use SleepingOwl\Admin\Form\FormElements;
-use DaveJamesMiller\Breadcrumbs\Generator;
 use SleepingOwl\Admin\Form\Columns\Column;
 use SleepingOwl\Admin\Display\DisplayTable;
 use Illuminate\Contracts\Support\Renderable;
@@ -24,11 +23,6 @@ class AdminController extends Controller
      * @var \DaveJamesMiller\Breadcrumbs\Manager
      */
     protected $breadcrumbs;
-
-    /**
-     * @var
-     */
-    protected $breadCrumbsData;
 
     /**
      * @var AdminInterface
@@ -61,16 +55,16 @@ class AdminController extends Controller
         $admin->navigation()->setCurrentUrl($request->getUri());
 
         if (! $this->breadcrumbs->exists('home')) {
-            $this->breadcrumbs->register('home', function (Generator $breadcrumbs) {
+            $this->breadcrumbs->register('home', function ($breadcrumbs) {
                 $breadcrumbs->push(trans('sleeping_owl::lang.dashboard'), route('admin.dashboard'));
             });
         }
 
-        $this->breadCrumbsData = [];
+        $breadcrumbs = [];
 
         if ($currentPage = $admin->navigation()->getCurrentPage()) {
             foreach ($currentPage->getPathArray() as $page) {
-                $this->breadCrumbsData[] = [
+                $breadcrumbs[] = [
                     'id' => $page['id'],
                     'title' => $page['title'],
                     'url' => $page['url'],
@@ -78,6 +72,15 @@ class AdminController extends Controller
                 ];
 
                 $this->parentBreadcrumb = $page['id'];
+            }
+        }
+
+        foreach ($breadcrumbs as  $breadcrumb) {
+            if (! $this->breadcrumbs->exists($breadcrumb['id'])) {
+                $this->breadcrumbs->register($breadcrumb['id'], function ($breadcrumbs) use ($breadcrumb) {
+                    $breadcrumbs->parent($breadcrumb['parent']);
+                    $breadcrumbs->push($breadcrumb['title'], $breadcrumb['url']);
+                });
             }
         }
     }
@@ -122,11 +125,7 @@ class AdminController extends Controller
             abort(404);
         }
 
-        $display = $model->fireDisplay();
-
-        $this->registerBreadcrumbs($model);
-
-        return $this->render($model, $display);
+        return $this->render($model, $model->fireDisplay());
     }
 
     /**
@@ -145,7 +144,6 @@ class AdminController extends Controller
         $create = $model->fireCreate();
 
         $this->registerBreadcrumb($model->getCreateTitle(), $this->parentBreadcrumb);
-        $this->registerBreadcrumbs($model);
 
         return $this->render($model, $create, $model->getCreateTitle());
     }
@@ -241,11 +239,7 @@ class AdminController extends Controller
 
         $this->registerBreadcrumb($model->getEditTitle(), $this->parentBreadcrumb);
 
-        $edit = $model->fireEdit($id);
-
-        $this->registerBreadcrumbs($model);
-
-        return $this->render($model, $edit, $model->getEditTitle());
+        return $this->render($model, $model->fireEdit($id), $model->getEditTitle());
     }
 
     /**
@@ -343,7 +337,7 @@ class AdminController extends Controller
         /* @var ColumnEditableInterface|null $column */
         if (is_callable([$display, 'getColumns'])) {
             $column = $display->getColumns()->all()->filter(function ($column) use ($field) {
-                return ($column instanceof ColumnEditableInterface) && $field == $column->getName();
+                return ($column instanceof ColumnEditableInterface) and $field == $column->getName();
             })->first();
         } else {
             if ($display instanceof DisplayTabbed) {
@@ -352,7 +346,7 @@ class AdminController extends Controller
 
                     if ($content instanceof DisplayTable) {
                         $column = $content->getColumns()->all()->filter(function ($column) use ($field) {
-                            return ($column instanceof ColumnEditableInterface) && $field == $column->getName();
+                            return ($column instanceof ColumnEditableInterface) and $field == $column->getName();
                         })->first();
                     }
                     if ($content instanceof FormElements) {
@@ -361,7 +355,7 @@ class AdminController extends Controller
                             //Return data-table if inside FormElements
                             if ($element instanceof DisplayTable) {
                                 $column = $element->getColumns()->all()->filter(function ($column) use ($field) {
-                                    return ($column instanceof ColumnEditableInterface) && $field == $column->getName();
+                                    return ($column instanceof ColumnEditableInterface) and $field == $column->getName();
                                 })->first();
                             }
 
@@ -370,7 +364,7 @@ class AdminController extends Controller
                                 foreach ($element->getElements() as $columnElement) {
                                     if ($columnElement instanceof DisplayTable) {
                                         $column = $columnElement->getColumns()->all()->filter(function ($column) use ($field) {
-                                            return ($column instanceof ColumnEditableInterface) && $field == $column->getName();
+                                            return ($column instanceof ColumnEditableInterface) and $field == $column->getName();
                                         })->first();
                                     }
                                 }
@@ -394,20 +388,22 @@ class AdminController extends Controller
 
         $column->setModel($item);
 
-        if ($model->fireEvent('updating', true, $item, $request) === false) {
+        if ($model->fireEvent('updating', true, $item) === false) {
             return;
         }
 
         $column->save($request, $model);
 
-        $model->fireEvent('updated', false, $item, $request);
+        $model->fireEvent('updated', false, $item);
     }
 
     /**
      * @param ModelConfigurationInterface $model
-     * @param Request $request
-     * @param int $id
+     * @param int                $id
+     *
      * @return \Illuminate\Http\RedirectResponse
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function deleteDelete(ModelConfigurationInterface $model, Request $request, $id)
     {
@@ -419,13 +415,13 @@ class AdminController extends Controller
 
         $model->fireDelete($id);
 
-        if ($model->fireEvent('deleting', true, $item, $request) === false) {
+        if ($model->fireEvent('deleting', true, $item) === false) {
             return redirect()->back();
         }
 
         $model->getRepository()->delete($id);
 
-        $model->fireEvent('deleted', false, $item, $request);
+        $model->fireEvent('deleted', false, $item);
 
         return redirect($request->input('_redirectBack', back()->getTargetUrl()))
             ->with('success_message', $model->getMessageOnDelete());
@@ -454,13 +450,13 @@ class AdminController extends Controller
 
         $model->fireDestroy($id);
 
-        if ($model->fireEvent('destroying', true, $item, $request) === false) {
+        if ($model->fireEvent('destroying', true, $item) === false) {
             return redirect()->back();
         }
 
         $model->getRepository()->forceDelete($id);
 
-        $model->fireEvent('destroyed', false, $item, $request);
+        $model->fireEvent('destroyed', false, $item);
 
         return redirect($request->input('_redirectBack', back()->getTargetUrl()))
             ->with('success_message', $model->getMessageOnDestroy());
@@ -489,13 +485,13 @@ class AdminController extends Controller
 
         $model->fireRestore($id);
 
-        if ($model->fireEvent('restoring', true, $item, $request) === false) {
+        if ($model->fireEvent('restoring', true, $item) === false) {
             return redirect()->back();
         }
 
         $model->getRepository()->restore($id);
 
-        $model->fireEvent('restored', false, $item, $request);
+        $model->fireEvent('restored', false, $item);
 
         return redirect($request->input('_redirectBack', back()->getTargetUrl()))
             ->with('success_message', $model->getMessageOnRestore());
@@ -568,28 +564,11 @@ class AdminController extends Controller
      */
     protected function registerBreadcrumb($title, $parent)
     {
-        $this->breadcrumbs->register('render', function (Generator $breadcrumbs) use ($title, $parent) {
+        $this->breadcrumbs->register('render', function ($breadcrumbs) use ($title, $parent) {
             $breadcrumbs->parent($parent);
             $breadcrumbs->push($title);
         });
 
         $this->parentBreadcrumb = 'render';
-    }
-
-    /**
-     * @param ModelConfigurationInterface $model
-     */
-    protected function registerBreadcrumbs(ModelConfigurationInterface $model)
-    {
-        $this->breadCrumbsData = $this->breadCrumbsData + (array) $model->getBreadCrumbs();
-
-        foreach ($this->breadCrumbsData as  $breadcrumb) {
-            if (! $this->breadcrumbs->exists($breadcrumb['id'])) {
-                $this->breadcrumbs->register($breadcrumb['id'], function (Generator $breadcrumbs) use ($breadcrumb) {
-                    $breadcrumbs->parent($breadcrumb['parent']);
-                    $breadcrumbs->push($breadcrumb['title'], $breadcrumb['url']);
-                });
-            }
-        }
     }
 }

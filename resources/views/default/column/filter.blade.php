@@ -3,4 +3,3 @@
 		<i class="{{ $icon }}" data-toggle="tooltip" title="{{ $title }}"></i>
 	</a>
 @endif
-

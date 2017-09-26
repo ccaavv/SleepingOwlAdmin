@@ -11,6 +11,7 @@ use SleepingOwl\Admin\Contracts\Form\FormElementFactoryInterface;
 /**
  * @method Element\Text text($name, $label = null)
  * @method Element\Image image($name, $label = null)
+ * @method Element\ImageCropper imageCropper($name, $label = null)
  * @method Element\Images images($name, $label = null)
  * @method Element\File file($name, $label = null)
  * @method Element\Time time($name, $label = null)
@@ -69,6 +70,7 @@ class FormElementFactory extends AliasBinder implements FormElementFactoryInterf
             'textarea' => Element\Textarea::class,
             'view' => Element\View::class,
             'image' => Element\Image::class,
+            'imageCropper' => Element\ImageCropper::class,
             'images' => Element\Images::class,
             'file' => Element\File::class,
             'radio' => Element\Radio::class,

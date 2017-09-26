@@ -7,14 +7,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use SleepingOwl\Admin\Display\Extension\Columns;
-use SleepingOwl\Admin\Display\Extension\ColumnsTotal;
 use SleepingOwl\Admin\Display\Extension\ColumnFilters;
 use SleepingOwl\Admin\Contracts\Display\ColumnInterface;
 use SleepingOwl\Admin\Contracts\Display\Extension\ColumnFilterInterface;
 
 /**
  * Class DisplayTable.
- *
+
  * @method Columns getColumns()
  * @method $this setColumns(ColumnInterface|ColumnInterface[] $column)
  *
@@ -62,7 +61,6 @@ class DisplayTable extends Display
 
         $this->extend('columns', new Columns());
         $this->extend('column_filters', new ColumnFilters());
-        $this->extend('columns_total', new ColumnsTotal());
     }
 
     /**
@@ -73,7 +71,7 @@ class DisplayTable extends Display
         parent::initialize();
 
         if ($this->getModelConfiguration()->isRestorableModel()) {
-            $this->setApply(function (Builder $q) {
+            $this->setApply(function ($q) {
                 return $q->withTrashed();
             });
         }

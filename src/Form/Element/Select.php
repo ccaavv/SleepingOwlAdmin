@@ -22,17 +22,11 @@ class Select extends NamedFormElement
      * @var bool
      */
     protected $sortable = true;
-    protected $sortable_flags = null;
 
     /**
      * @var array
      */
     protected $exclude = [];
-
-    /**
-     * @var int
-     */
-    protected $limit = 0;
 
     /**
      * @var string
@@ -50,7 +44,7 @@ class Select extends NamedFormElement
 
         if (is_array($options)) {
             $this->setOptions($options);
-        } elseif (($options instanceof Model) || is_string($options)) {
+        } elseif (($options instanceof Model) or is_string($options)) {
             $this->setModelForOptions($options);
         }
     }
@@ -68,21 +62,7 @@ class Select extends NamedFormElement
 
         $options = array_except($this->options, $this->exclude);
         if ($this->isSortable()) {
-            asort($options, $this->getSortableFlags());
-        }
-
-        return $options;
-    }
-
-    /**
-     * @return array
-     */
-    public function mutateOptions()
-    {
-        $options = [];
-        $temp = $this->getOptions();
-        foreach ($temp as $key => $value) {
-            $options[] = ['id' => $key, 'text' => $value];
+            asort($options);
         }
 
         return $options;
@@ -125,31 +105,19 @@ class Select extends NamedFormElement
     {
         $this->nullable = true;
 
-        $this->addValidationRule('nullable');
-
         return $this;
     }
 
     /**
      * @param bool $sortable
      *
-     * @param null $sortable_flags
      * @return $this
      */
-    public function setSortable($sortable, $sortable_flags = null)
+    public function setSortable($sortable)
     {
         $this->sortable = (bool) $sortable;
-        $this->sortable_flags = $sortable_flags;
 
         return $this;
-    }
-
-    /**
-     * @return null
-     */
-    protected function getSortableFlags()
-    {
-        return $this->sortable_flags;
     }
 
     /**
@@ -158,25 +126,6 @@ class Select extends NamedFormElement
     public function isSortable()
     {
         return $this->sortable;
-    }
-
-    /**
-     * @return int
-     */
-    protected function getLimit()
-    {
-        return $this->limit;
-    }
-
-    /**
-     * @param $limit
-     * @return $this
-     */
-    public function setLimit($limit)
-    {
-        $this->limit = $limit;
-
-        return $this;
     }
 
     /**
@@ -216,23 +165,22 @@ class Select extends NamedFormElement
             'id'               => $this->getName(),
             'size'             => 2,
             'data-select-type' => 'single',
-            'class'            => 'form-control',
+            'class'            => 'form-control input-select',
         ]);
 
         if ($this->isReadonly()) {
             $this->setHtmlAttribute('disabled', 'disabled');
         }
 
-        $options = $this->mutateOptions();
+        $options = $this->getOptions();
 
         if ($this->isNullable()) {
             $this->setHtmlAttribute('data-nullable', 'true');
-            $options = collect($options)->prepend(['id' => null, 'text' => trans('sleeping_owl::lang.select.nothing')]);
+            $options = [null => trans('sleeping_owl::lang.select.nothing')] + $options;
         }
 
-        return ['attributes' => $this->htmlAttributesToString()] + parent::toArray() + [
+        return ['attributes' => $this->getHtmlAttributes()] + parent::toArray() + [
                 'options'  => $options,
-                'limit'    => $this->getLimit(),
                 'nullable' => $this->isNullable(),
             ];
     }
@@ -244,7 +192,7 @@ class Select extends NamedFormElement
      */
     public function prepareValue($value)
     {
-        if ($this->isNullable() && $value == '') {
+        if ($this->isNullable() and $value == '') {
             return;
         }
 

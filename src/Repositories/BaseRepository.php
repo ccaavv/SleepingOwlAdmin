@@ -3,7 +3,6 @@
 namespace SleepingOwl\Admin\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use SleepingOwl\Admin\Exceptions\RepositoryException;
 use SleepingOwl\Admin\Contracts\Repositories\RepositoryInterface;
 
@@ -193,6 +192,6 @@ class BaseRepository implements RepositoryInterface
      */
     public function isRestorable()
     {
-        return in_array(SoftDeletes::class, class_uses_recursive($this->getClass()));
+        return in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive($this->getClass()));
     }
 }

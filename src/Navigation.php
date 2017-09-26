@@ -2,7 +2,6 @@
 
 namespace SleepingOwl\Admin;
 
-use Route;
 use Illuminate\Support\Collection;
 use SleepingOwl\Admin\Contracts\Navigation\PageInterface;
 use SleepingOwl\Admin\Contracts\Navigation\NavigationInterface;
@@ -56,19 +55,6 @@ class Navigation extends \KodiComponents\Navigation\Navigation implements Naviga
     {
         $pages->each(function (PageInterface $page) use ($url) {
             $urlPath = parse_url($url, PHP_URL_PATH);
-
-            if (Route::current()) {
-                $parameters = collect(Route::current()->parameters());
-
-                if ($parameters->has('adminModel')) {
-                    $routeUrl = route('admin.model', [
-                        'adminModel' => snake_case(class_basename($parameters->get('adminModel'))),
-                    ]);
-
-                    $urlPath = parse_url($routeUrl, PHP_URL_PATH);
-                }
-            }
-
             if ($urlPath) {
                 if (md5($urlPath) == $page->getAliasId()) {
                     $this->currentPage = $page;

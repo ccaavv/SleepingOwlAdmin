@@ -1,7 +1,6 @@
 @if($isEditable)
     <a href="#"
-       {!! $attributes !!}
-       data-mode="{{ $mode }}"
+       class="inline-editable"
        data-name="{{ $name }}"
        data-value="{{ $value }}"
        data-url="{{ $url }}"

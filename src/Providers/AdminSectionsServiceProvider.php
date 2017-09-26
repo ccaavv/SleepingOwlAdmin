@@ -2,7 +2,6 @@
 
 namespace SleepingOwl\Admin\Providers;
 
-use SleepingOwl\Admin\Admin;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Auth\Access\Gate;
 
@@ -27,9 +26,9 @@ class AdminSectionsServiceProvider extends ServiceProvider
     }
 
     /**
-     * @param Admin $admin
+     * @param \SleepingOwl\Admin\Admin $admin
      */
-    public function boot(Admin $admin)
+    public function boot(\SleepingOwl\Admin\Admin $admin)
     {
         $admin->registerSections($this->sections());
     }
@@ -41,6 +40,7 @@ class AdminSectionsServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // TODO: Implement register() method.
     }
 
     /**

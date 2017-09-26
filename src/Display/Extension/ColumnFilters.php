@@ -2,11 +2,12 @@
 
 namespace SleepingOwl\Admin\Display\Extension;
 
+use Request;
 use KodiComponents\Support\HtmlAttributes;
 use SleepingOwl\Admin\Contracts\Initializable;
 use SleepingOwl\Admin\Contracts\Display\Placable;
 use SleepingOwl\Admin\Display\Column\Filter\Control;
-use SleepingOwl\Admin\Contracts\Display\ColumnInterface;
+use SleepingOwl\Admin\Contracts\Display\NamedColumnInterface;
 use SleepingOwl\Admin\Contracts\Display\Extension\ColumnFilterInterface;
 
 class ColumnFilters extends Extension implements Initializable, Placable
@@ -188,7 +189,7 @@ class ColumnFilters extends Extension implements Initializable, Placable
      */
     public function modifyQuery(\Illuminate\Database\Eloquent\Builder $query)
     {
-        $search = \Request::input('columns', []);
+        $search = Request::input('columns', []);
 
         $display = $this->getDisplay();
 
@@ -206,7 +207,7 @@ class ColumnFilters extends Extension implements Initializable, Placable
             $column = $columns->get($index);
             $columnFilter = array_get($this->all(), $index);
 
-            if ($column && $column instanceof ColumnInterface && $columnFilter) {
+            if ($column && $column instanceof NamedColumnInterface && $columnFilter) {
                 $columnFilter->apply(
                     $column,
                     $query,

@@ -37,7 +37,7 @@ class DummyClass extends Section
      */
     public function onDisplay()
     {
-        // remove if unused
+        // todo: remove if unused
     }
 
     /**
@@ -47,7 +47,7 @@ class DummyClass extends Section
      */
     public function onEdit($id)
     {
-        // remove if unused
+        // todo: remove if unused
     }
 
     /**
@@ -63,7 +63,7 @@ class DummyClass extends Section
      */
     public function onDelete($id)
     {
-        // remove if unused
+        // todo: remove if unused
     }
 
     /**
@@ -71,6 +71,6 @@ class DummyClass extends Section
      */
     public function onRestore($id)
     {
-        // remove if unused
+        // todo: remove if unused
     }
 }

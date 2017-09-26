@@ -44,7 +44,6 @@ return [
         'restore' => 'Restore',
         'delete' => 'Delete',
         'delete-confirm' => 'Are you sure want to delete this entry?',
-        'action-confirm' => 'Are you sure want to make this action?',
         'delete-error' => 'Error while deleting this entry. You must delete all linked entries first.',
         'destroy' => 'Destroy',
         'destroy-confirm' => 'Are you sure want to permanently delete this entry?',
@@ -95,10 +94,6 @@ return [
         'nothing' => 'Nothing selected',
         'selected' => 'selected',
         'placeholder' => 'Select from the list',
-        'no_items'    => 'No items',
-        'init'        => 'Press Enter to select',
-        'limit'       => 'and ${count} more',
-        'deselect'    => 'Press Enter to deselect',
     ],
     'image' => [
         'browse' => 'Select Image',
@@ -113,7 +108,6 @@ return [
     'button' => [
         'yes' => 'Yes',
         'no' => 'No',
-        'cancel' => 'Cancel'
     ],
     'message' => [
         'created' => '<i class="fa fa-check fa-lg"></i> Record has been created successfully',

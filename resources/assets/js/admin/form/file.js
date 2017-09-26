@@ -19,7 +19,7 @@ Vue.component('element-file', Vue.extend({
         return {
             errors: [],
             uploading: false,
-            val: '',
+            val: false,
         }
     },
     mounted () {
@@ -48,7 +48,7 @@ Vue.component('element-file', Vue.extend({
                 },
                 error (file, response) {
                     if(_.isArray(response.errors)) {
-                        self.errors = response.errors;
+                        self.$set(self.errors, response.errors);
                     }
                 },
                 complete(){
@@ -60,11 +60,11 @@ Vue.component('element-file', Vue.extend({
             var self = this;
 
             Admin.Messages.confirm(trans('lang.message.are_you_sure')).then(() => {
-                self.val = '';
+                self.val = false;
             });
         },
         closeAlert () {
-            this.errors = [];
+            this.$set(this.errors, []);
         }
     },
     computed: {

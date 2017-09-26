@@ -4,7 +4,6 @@ namespace SleepingOwl\Admin\Routing;
 
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
-use Illuminate\Routing\ControllerDispatcher;
 use SleepingOwl\Admin\Model\ModelCollection;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -65,9 +64,7 @@ class ModelRouter
             }
 
             if ($model->hasCustomControllerClass() && $route->getActionName() !== 'Closure') {
-                $temp = explode('@', $route->getActionName(), 2);
-
-                $action = $temp[1];
+                list($controller, $action) = explode('@', $route->getActionName(), 2);
 
                 if (method_exists($model->getControllerClass(), $action)) {
                     $this->runCustomController($route, $model->getControllerClass(), $action);
@@ -86,7 +83,7 @@ class ModelRouter
     protected function runCustomController(Route $route, $controller, $action)
     {
         $route->uses(function () use ($route, $controller, $action) {
-            return (new ControllerDispatcher($this->app))->dispatch(
+            return (new \Illuminate\Routing\ControllerDispatcher($this->app))->dispatch(
                 $route, $this->app->make($controller), $action
             );
         });

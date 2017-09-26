@@ -6,7 +6,6 @@ use SleepingOwl\Admin\Traits\Assets;
 use SleepingOwl\Admin\Traits\Renderable;
 use KodiComponents\Support\HtmlAttributes;
 use SleepingOwl\Admin\Display\Extension\Apply;
-use SleepingOwl\Admin\Display\Extension\Links;
 use SleepingOwl\Admin\Display\Extension\Scopes;
 use SleepingOwl\Admin\Display\Extension\Actions;
 use SleepingOwl\Admin\Display\Extension\Filters;
@@ -82,7 +81,6 @@ abstract class Display implements DisplayInterface
         $this->extend('filters', new Filters());
         $this->extend('apply', new Apply());
         $this->extend('scopes', new Scopes());
-        $this->extend('links', new Links());
 
         $this->initializePackage();
     }
@@ -244,8 +242,6 @@ abstract class Display implements DisplayInterface
                     $view->getFactory()->startSection($block);
                     echo $html;
                     $view->getFactory()->yieldSection();
-                } else {
-                    $view->getFactory()->flushSections();
                 }
             }
         }
@@ -263,9 +259,9 @@ abstract class Display implements DisplayInterface
     {
         $method = snake_case(substr($name, 3));
 
-        if (starts_with($name, 'get') && $this->extensions->has($method)) {
+        if (starts_with($name, 'get') and $this->extensions->has($method)) {
             return $this->extensions->get($method);
-        } elseif (starts_with($name, 'set') && $this->extensions->has($method)) {
+        } elseif (starts_with($name, 'set') and $this->extensions->has($method)) {
             $extension = $this->extensions->get($method);
 
             if (method_exists($extension, 'set')) {

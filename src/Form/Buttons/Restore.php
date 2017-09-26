@@ -4,7 +4,7 @@
 namespace SleepingOwl\Admin\Form\Buttons;
 
 /**
- * Class Restore.
+ * Class Save.
  */
 class Restore extends FormButton
 {
@@ -18,13 +18,13 @@ class Restore extends FormButton
     }
 
     /**
-     * Init Restore Button.
+     * Init Cancel Button.
      */
     public function initialize()
     {
         parent::initialize();
 
-        $this->setHtmlAttributes($this->getHtmlAttributes() + [
+        $this->setHtmlAttributes([
             'type'  => 'submit',
             'name'  => 'next_action',
             'class' => 'btn btn-warning',
