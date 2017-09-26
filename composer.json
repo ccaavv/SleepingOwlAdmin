@@ -1,7 +1,6 @@
 {
   "name": "cccaaavvv/so-cms",
   "description": "Administrative interface builder for Laravel. Build on SleepingOwl fork",
-  "homepage": "http://sleepingowl.ru",
   "keywords": [
     "laravel",
     "admin",
@@ -10,22 +9,10 @@
     "panel"
   ],
   "license": "MIT",
-  "support": {
-    "issues": "https://github.com/LaravelRUS/SleepingOwlAdmin/issues",
-    "source": "https://github.com/LaravelRUS/SleepingOwlAdmin"
-  },
   "authors": [
     {
-      "name": "Sleeping Owl",
-      "email": "owl.sleeping@yahoo.com"
-    },
-    {
-      "name": "Pavel Buchnev",
-      "email": "butschster@gmail.com"
-    },
-    {
-      "name": "Dave Gabrielyan",
-      "email": "aioslike@gmail.com"
+      "name": "Aleks",
+      "email": "cccaaavvv@gmail.com"
     }
   ],
   "require": {
