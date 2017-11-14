@@ -10,6 +10,7 @@ use SleepingOwl\Admin\Contracts\Form\FormElementFactoryInterface;
 
 /**
  * @method Element\Text text($name, $label = null)
+ * @method Element\Color color($name, $label = null)
  * @method Element\Image image($name, $label = null)
  * @method Element\ImageCropper imageCropper($name, $label = null)
  * @method Element\Images images($name, $label = null)
@@ -54,6 +55,7 @@ class FormElementFactory extends AliasBinder implements FormElementFactoryInterf
             'columns' => Columns\Columns::class,
             'column' => Columns\Column::class,
             'text' => Element\Text::class,
+            'color' => Element\Color::class,
             'time' => Element\Time::class,
             'date' => Element\Date::class,
             'datetime' => Element\DateTime::class,

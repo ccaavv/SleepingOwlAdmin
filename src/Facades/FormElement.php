@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static \SleepingOwl\Admin\Form\Element\Text text($name, $label = null)
+ * @method static \SleepingOwl\Admin\Form\Element\Color color($name, $label = null)
  * @method static \SleepingOwl\Admin\Form\Element\Image image($name, $label = null)
  * @method static \SleepingOwl\Admin\Form\Element\ImageCropper imageCropper($name, $label = null)
  * @method static \SleepingOwl\Admin\Form\Element\Images images($name, $label = null)
