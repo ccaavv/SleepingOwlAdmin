@@ -43,6 +43,11 @@ interface ModelConfigurationInterface
     public function getEditTitle();
 
     /**
+     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     */
+    public function getViewTitle();
+
+    /**
      * @return bool
      */
     public function isDisplayable();
@@ -122,6 +127,13 @@ interface ModelConfigurationInterface
     public function fireEdit($id);
 
     /**
+     * @param $id
+     *
+     * @return mixed|void
+     */
+    public function fireView($id);
+
+    /**
      * @deprecated
      * @param int $id
      *
@@ -182,6 +194,13 @@ interface ModelConfigurationInterface
      * @return string
      */
     public function getEditUrl($id);
+
+    /**
+     * @param string|int $id
+     *
+     * @return string
+     */
+    public function getViewUrl($id);
 
     /**
      * @param string|int $id

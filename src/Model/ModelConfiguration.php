@@ -22,6 +22,11 @@ class ModelConfiguration extends ModelConfigurationManager
     protected $editTitle;
 
     /**
+     * @var string
+     */
+    protected $viewTitle;
+
+    /**
      * @var Closure|null
      */
     protected $display;
@@ -164,6 +169,18 @@ class ModelConfiguration extends ModelConfigurationManager
         }
 
         return $this->editTitle;
+    }
+
+    /**
+     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     */
+    public function getViewTitle()
+    {
+        if (is_null($this->viewTitle)) {
+            return parent::getViewTitle();
+        }
+
+        return $this->viewTitle;
     }
 
     /**
@@ -475,6 +492,35 @@ class ModelConfiguration extends ModelConfigurationManager
 
         if ($form instanceof FormInterface) {
             $form->setId($id);
+        }
+
+        return $form;
+    }
+
+    /**
+     * @param int|string $id
+     *
+     * @return mixed|void
+     */
+    public function fireView($id)
+    {
+        if (! is_callable($this->getEdit())) {
+            return;
+        }
+
+        $form = $this->app->call($this->getEdit(), ['id' => $id]);
+        if ($form instanceof DisplayInterface) {
+            $form->setModelClass($this->getClass());
+        }
+
+        if ($form instanceof Initializable) {
+            $form->initialize();
+        }
+
+        if ($form instanceof FormInterface) {
+            $form->setAction('');
+            $form->setId($id);
+            $form->setDisabled(true);
         }
 
         return $form;

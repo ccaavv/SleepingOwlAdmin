@@ -15,6 +15,11 @@ $router->group(['as' => 'admin.', 'namespace' => 'SleepingOwl\Admin\Http\Control
         'uses' => 'AdminController@inlineEdit',
     ]);
 
+	$router->post('{adminModel}/custom', [
+		'as'   => 'model.custom_display',
+		'uses' => 'AdminController@displayUpdate',
+	]);
+
     $router->get('{adminModel}/create', [
         'as'   => 'model.create',
         'uses' => 'AdminController@getCreate',
@@ -29,6 +34,16 @@ $router->group(['as' => 'admin.', 'namespace' => 'SleepingOwl\Admin\Http\Control
         'as'   => 'model.edit',
         'uses' => 'AdminController@getEdit',
     ]);
+
+	$router->get('{adminModel}/{adminModelId}/duplicate', [
+		'as'   => 'model.duplicate',
+		'uses' => 'AdminController@getDuplicate',
+	]);
+
+	$router->get('{adminModel}/{adminModelId}/view', [
+		'as'   => 'model.view',
+		'uses' => 'AdminController@getView',
+	]);
 
     $router->post('{adminModel}/{adminModelId}/edit', [
         'as'   => 'model.update',
@@ -54,4 +69,9 @@ $router->group(['as' => 'admin.', 'namespace' => 'SleepingOwl\Admin\Http\Control
         'as'   => 'wildcard',
         'uses' => 'AdminController@getWildcard',
     ]);
+
+	$router->post('/renew-image', [
+		'as'   => 'renew-image',
+		'uses' => 'UploadController@renewImage',
+	]);
 });

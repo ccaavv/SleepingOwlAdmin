@@ -90,7 +90,7 @@ abstract class ModelConfigurationManager implements ModelConfigurationInterface
     /**
      * @var bool
      */
-    protected $checkAccess = false;
+    protected $checkAccess = true;
 
     /**
      * @var array
@@ -199,6 +199,14 @@ abstract class ModelConfigurationManager implements ModelConfigurationInterface
     public function getEditTitle()
     {
         return trans('sleeping_owl::lang.model.edit', ['title' => $this->getTitle()]);
+    }
+
+    /**
+     * @return string|\Symfony\Component\Translation\TranslatorInterface
+     */
+    public function getViewTitle()
+    {
+        return trans('sleeping_owl::lang.model.view', ['title' => $this->getTitle()]);
     }
 
     /**
@@ -358,8 +366,22 @@ abstract class ModelConfigurationManager implements ModelConfigurationInterface
      */
     public function getCancelUrl(array $parameters = [])
     {
-        return URL::previous() ?: $this->getDisplayUrl($parameters);
+        //return URL::previous() ?: $this->getDisplayUrl($parameters);
+        return session()->has($this->getAlias().'_back_url')
+			? session($this->getAlias().'_back_url')
+			: $this->getDisplayUrl($parameters);
     }
+
+
+	/**
+	 * @param string|int $id
+	 *
+	 * @return string
+	 */
+	public function getDuplicateUrl($id)
+	{
+		return route('admin.model.duplicate', [$this->getAlias(), $id]);
+	}
 
     /**
      * @param array $parameters
@@ -389,6 +411,16 @@ abstract class ModelConfigurationManager implements ModelConfigurationInterface
     public function getEditUrl($id)
     {
         return route('admin.model.edit', [$this->getAlias(), $id]);
+    }
+
+    /**
+     * @param string|int $id
+     *
+     * @return string
+     */
+    public function getViewUrl($id)
+    {
+        return route('admin.model.view', [$this->getAlias(), $id]);
     }
 
     /**
@@ -453,6 +485,14 @@ abstract class ModelConfigurationManager implements ModelConfigurationInterface
     public function getMessageOnDelete()
     {
         return trans('sleeping_owl::lang.message.deleted');
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessageOnDuplicate($id)
+    {
+        return trans('sleeping_owl::lang.message.duplicated', ['id' => $id]);
     }
 
     /**

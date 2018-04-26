@@ -16,6 +16,7 @@ return [
     'model' => [
         'create' => ':title bölümüne yeni kayıt gir',
         'edit' => ':title bölümünde kayıt güncelle',
+        'view' => ':title bölümünde kayıt güncelle',
     ],
     'links' => [
         'index_page' => 'Site linki',

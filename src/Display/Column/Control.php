@@ -64,7 +64,17 @@ class Control extends TableColumn
     {
         parent::initialize();
 
-        $this->buttons->put('edit', $button = new ControlLink(function (Model $model) {
+		$this->buttons->put('view', $button = new ControlLink(function (Model $model) {
+			return $this->getModelConfiguration()->getViewUrl($model->getKey());
+		}, trans('sleeping_owl::lang.table.view'), 0));
+		$button->hideText();
+		$button->setCondition(function () {
+			return !$this->isEditable();
+		});
+		$button->setIcon('fa fa-eye');
+		$button->setHtmlAttribute('class', 'btn-primary');
+
+		$this->buttons->put('edit', $button = new ControlLink(function (Model $model) {
             return $this->getModelConfiguration()->getEditUrl($model->getKey());
         }, trans('sleeping_owl::lang.table.edit'), 100));
         $button->hideText();

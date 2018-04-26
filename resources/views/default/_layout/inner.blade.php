@@ -14,8 +14,8 @@
 			{!! $template->renderBreadcrumbs($breadcrumbKey) !!}
 
 			<div class="content-header">
-				<h1>
-					{{{ $title }}}
+				<h1 class="panel-header">
+					{!!  $title  !!}
 				</h1>
 			</div>
 
@@ -28,4 +28,5 @@
 			</div>
 		</div>
 	</div>
+
 @stop

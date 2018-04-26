@@ -3,6 +3,7 @@
 namespace SleepingOwl\Admin\Factories;
 
 use SleepingOwl\Admin\AliasBinder;
+use SleepingOwl\Admin\Display\DisplayCustom;
 use SleepingOwl\Admin\Navigation\Page;
 use SleepingOwl\Admin\Display\DisplayTab;
 use SleepingOwl\Admin\Display\DisplayTree;
@@ -40,6 +41,7 @@ class DisplayFactory extends AliasBinder implements DisplayFactoryInterface
             'tab' => DisplayTab::class,
             'tabbed' => DisplayTabbed::class,
             'table' => DisplayTable::class,
+            'custom' => DisplayCustom::class,
             'tree' => DisplayTree::class,
             'page' => Page::class,
         ]);

@@ -8,6 +8,7 @@
 	use SleepingOwl\Admin\Traits\Renderable;
 	use KodiComponents\Support\HtmlAttributes;
 	use SleepingOwl\Admin\Form\Buttons\Cancel;
+	use SleepingOwl\Admin\Form\Buttons\Duplicate;
 	use SleepingOwl\Admin\Form\Buttons\Delete;
 	use SleepingOwl\Admin\Form\Buttons\FormButton;
 	use SleepingOwl\Admin\Form\Buttons\SaveAndClose;
@@ -205,6 +206,7 @@
 				'save'            => new Save(),
 				'save_and_create' => new SaveAndCreate(),
 				'save_and_close'  => new SaveAndClose(),
+				'duplicate'       => new Duplicate(),
 				'delete'          => new Delete(),
 				'cancel'          => new Cancel(),
 			];

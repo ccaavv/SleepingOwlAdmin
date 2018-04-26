@@ -1,273 +1,269 @@
 <?php
 
-namespace SleepingOwl\Admin\Form;
+	namespace SleepingOwl\Admin\Form;
 
-use Closure;
-use Illuminate\Http\Request;
-use SleepingOwl\Admin\Traits\Assets;
-use Illuminate\Database\Eloquent\Model;
-use SleepingOwl\Admin\Traits\Renderable;
-use SleepingOwl\Admin\Traits\VisibleCondition;
-use SleepingOwl\Admin\Contracts\Form\FormElementInterface;
-use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
+	use Closure;
+	use Illuminate\Http\Request;
+	use SleepingOwl\Admin\Traits\Assets;
+	use Illuminate\Database\Eloquent\Model;
+	use SleepingOwl\Admin\Traits\Renderable;
+	use SleepingOwl\Admin\Traits\VisibleCondition;
+	use SleepingOwl\Admin\Contracts\Form\FormElementInterface;
+	use SleepingOwl\Admin\Contracts\Template\TemplateInterface;
 
-abstract class FormElement implements FormElementInterface
-{
-    use Assets, VisibleCondition, Renderable;
+	abstract class FormElement implements FormElementInterface
+	{
+		use Assets, VisibleCondition, Renderable;
 
-    /**
-     * @var TemplateInterface
-     */
-    protected $template;
+		/**
+		 * @var TemplateInterface
+		 */
+		protected $template;
 
-    /**
-     * @var Model
-     */
-    protected $model;
+		/**
+		 * @var Model
+		 */
+		protected $model;
 
-    /**
-     * @var array
-     */
-    protected $validationRules = [];
+		/**
+		 * @var array
+		 */
+		protected $validationRules = [];
 
-    /**
-     * @var array
-     */
-    protected $validationMessages = [];
+		/**
+		 * @var array
+		 */
+		protected $validationMessages = [];
 
-    /**
-     * @var bool|callable
-     */
-    protected $readonly = false;
+		/**
+		 * @var bool|callable
+		 */
+		protected $readonly = false;
 
-    /**
-     * @var bool|callable
-     */
-    protected $valueSkipped = false;
+		/**
+		 * @var bool|callable
+		 */
+		protected $valueSkipped = false;
 
-    /**
-     * @var mixed
-     */
-    protected $value;
+		/**
+		 * @var mixed
+		 */
+		protected $value;
 
-    public function __construct()
-    {
-        $this->initializePackage();
-    }
+		public function __construct()
+		{
+			$this->initializePackage();
+		}
 
-    public function initialize()
-    {
-        $this->includePackage();
-    }
+		public function initialize()
+		{
+			$this->includePackage();
+		}
 
-    /**
-     * @return array
-     */
-    public function getValidationMessages()
-    {
-        return $this->validationMessages;
-    }
+		/**
+		 * @return array
+		 */
+		public function getValidationMessages()
+		{
+			return $this->validationMessages;
+		}
 
-    /**
-     * @param string $rule
-     * @param string $message
-     *
-     * @return $this
-     */
-    public function addValidationMessage($rule, $message)
-    {
-        if (($pos = strpos($rule, ':')) !== false) {
-            $rule = substr($rule, 0, $pos);
-        }
+		/**
+		 * @param string $rule
+		 * @param string $message
+		 *
+		 * @return $this
+		 */
+		public function addValidationMessage($rule, $message)
+		{
+			if (($pos = strpos($rule, ':')) !== false) {
+				$rule = substr($rule, 0, $pos);
+			}
+			$this->validationMessages[$rule] = $message;
 
-        $this->validationMessages[$rule] = $message;
+			return $this;
+		}
 
-        return $this;
-    }
+		/**
+		 * @param array $validationMessages
+		 *
+		 * @return $this
+		 */
+		public function setValidationMessages(array $validationMessages)
+		{
+			$this->validationMessages = $validationMessages;
 
-    /**
-     * @param array $validationMessages
-     *
-     * @return $this
-     */
-    public function setValidationMessages(array $validationMessages)
-    {
-        $this->validationMessages = $validationMessages;
+			return $this;
+		}
 
-        return $this;
-    }
+		/**
+		 * @return array
+		 */
+		public function getValidationLabels()
+		{
+			return [];
+		}
 
-    /**
-     * @return array
-     */
-    public function getValidationLabels()
-    {
-        return [];
-    }
+		/**
+		 * @return array
+		 */
+		public function getValidationRules()
+		{
+			return $this->validationRules;
+		}
 
-    /**
-     * @return array
-     */
-    public function getValidationRules()
-    {
-        return $this->validationRules;
-    }
+		/**
+		 * @param string      $rule
+		 * @param string|null $message
+		 *
+		 * @return $this
+		 */
+		public function addValidationRule($rule, $message = null)
+		{
+			$this->validationRules[] = $rule;
+			if (is_null($message)) {
+				return $this;
+			}
 
-    /**
-     * @param string $rule
-     * @param string|null $message
-     *
-     * @return $this
-     */
-    public function addValidationRule($rule, $message = null)
-    {
-        $this->validationRules[] = $rule;
+			return $this->addValidationMessage($rule, $message);
+		}
 
-        if (is_null($message)) {
-            return $this;
-        }
+		/**
+		 * @param array|string $validationRules
+		 *
+		 * @return $this
+		 */
+		public function setValidationRules($validationRules)
+		{
+			if (!is_array($validationRules)) {
+				$validationRules = func_get_args();
+			}
+			$this->validationRules = [];
+			foreach ($validationRules as $rule) {
+				$rules = explode('|', $rule);
+				foreach ($rules as $rule) {
+					$this->addValidationRule($rule);
+				}
+			}
 
-        return $this->addValidationMessage($rule, $message);
-    }
+			return $this;
+		}
 
-    /**
-     * @param array|string $validationRules
-     *
-     * @return $this
-     */
-    public function setValidationRules($validationRules)
-    {
-        if (! is_array($validationRules)) {
-            $validationRules = func_get_args();
-        }
+		/**
+		 * @return Model
+		 */
+		public function getModel()
+		{
+			return $this->model;
+		}
 
-        $this->validationRules = [];
-        foreach ($validationRules as $rule) {
-            $rules = explode('|', $rule);
+		/**
+		 * @param Model $model
+		 *
+		 * @return $this
+		 */
+		public function setModel(Model $model)
+		{
+			$this->model = $model;
 
-            foreach ($rules as $rule) {
-                $this->addValidationRule($rule);
-            }
-        }
+			return $this;
+		}
 
-        return $this;
-    }
+		/**
+		 * @return bool
+		 */
+		public function isReadonly()
+		{
+			if (is_callable($this->readonly)) {
+				return (bool)call_user_func($this->readonly, $this->getModel());
+			}
 
-    /**
-     * @return Model
-     */
-    public function getModel()
-    {
-        return $this->model;
-    }
+			return (bool)$this->readonly;
+		}
 
-    /**
-     * @param Model $model
-     *
-     * @return $this
-     */
-    public function setModel(Model $model)
-    {
-        $this->model = $model;
+		/**
+		 * @return bool
+		 */
+		public function isValueSkipped()
+		{
+			if (is_callable($this->valueSkipped)) {
+				return (bool)call_user_func($this->valueSkipped, $this->getModel());
+			}
 
-        return $this;
-    }
+			return (bool)$this->valueSkipped;
+		}
 
-    /**
-     * @return bool
-     */
-    public function isReadonly()
-    {
-        if (is_callable($this->readonly)) {
-            return (bool) call_user_func($this->readonly, $this->getModel());
-        }
+		/**
+		 * @param Closure|bool $valueSkipped
+		 *
+		 * @return $this
+		 */
+		public function setValueSkipped($valueSkipped)
+		{
+			$this->valueSkipped = $valueSkipped;
 
-        return (bool) $this->readonly;
-    }
+			return $this;
+		}
 
-    /**
-     * @return bool
-     */
-    public function isValueSkipped()
-    {
-        if (is_callable($this->valueSkipped)) {
-            return (bool) call_user_func($this->valueSkipped, $this->getModel());
-        }
+		/**
+		 * @param Closure|bool $readonly
+		 *
+		 * @return $this
+		 */
+		public function setReadonly($readonly)
+		{
+			$this->readonly = $readonly;
 
-        return (bool) $this->valueSkipped;
-    }
+			return $this;
+		}
 
-    /**
-     * @param Closure|bool $valueSkipped
-     *
-     * @return $this
-     */
-    public function setValueSkipped($valueSkipped)
-    {
-        $this->valueSkipped = $valueSkipped;
+		/**
+		 * @return mixed
+		 */
+		public function getValue()
+		{
+			return $this->value;
+		}
 
-        return $this;
-    }
+		/**
+		 * @param mixed $value
+		 *
+		 * @return $this
+		 */
+		public function setValue($value)
+		{
+			$this->value = $value;
 
-    /**
-     * @param Closure|bool $readonly
-     *
-     * @return $this
-     */
-    public function setReadonly($readonly)
-    {
-        $this->readonly = $readonly;
+			return $this;
+		}
 
-        return $this;
-    }
+		/**
+		 * @param Request $request
+		 *
+		 * @return void
+		 */
+		public function save(Request $request)
+		{
+		}
 
-    /**
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
+		/**
+		 * @param Request $request
+		 *
+		 * @return void
+		 */
+		public function afterSave(Request $request)
+		{
+		}
 
-    /**
-     * @param mixed $value
-     *
-     * @return $this
-     */
-    public function setValue($value)
-    {
-        $this->value = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return void
-     */
-    public function save(Request $request)
-    {
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return void
-     */
-    public function afterSave(Request $request)
-    {
-    }
-
-    /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return [
-            'value' => $this->getValue(),
-            'readonly' => $this->isReadonly(),
-            'model' => $this->getModel(),
-        ];
-    }
-}
+		/**
+		 * @return array
+		 */
+		public function toArray()
+		{
+			return [
+				'value'    => $this->getValue(),
+				'readonly' => $this->isReadonly(),
+				'model'    => $this->getModel(),
+			];
+		}
+	}

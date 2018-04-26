@@ -47,5 +47,8 @@ elixir(function(mix) {
         })
         .copy('resources/assets/fonts', 'public/default/fonts')
         .copy('node_modules/bootstrap/fonts', 'public/default/fonts')
-        .copy('node_modules/font-awesome/fonts', 'public/default/fonts');
+        .copy('node_modules/font-awesome/fonts', 'public/default/fonts')
+        .copy('public/default/js/admin-app.js', '../../../public/packages/sleepingowl/default/js')
+        .copy('public/default/js/vue.js', '../../../public/packages/sleepingowl/default/js')
+        .copy('public/default/js/modules.js', '../../../public/packages/sleepingowl/default/js');
 });

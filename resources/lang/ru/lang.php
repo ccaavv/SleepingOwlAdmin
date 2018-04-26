@@ -16,6 +16,7 @@ return [
     'model' => [
         'create' => 'Создание документа в разделе :title',
         'edit' => 'Редактирование записи в разделе :title',
+        'view' => 'Просмотр записи в разделе :title',
     ],
     'links' => [
         'index_page' => 'На сайт',
@@ -57,6 +58,7 @@ return [
         'save_and_close' => 'Сохранить и закрыть',
         'save_and_create' => 'Сохранить и создать',
         'cancel' => 'Отменить',
+        'duplicate' => 'Дублировать',
         'download' => 'Скачать',
         'all' => 'Все',
         'processing' => '<i class="fa fa-5x fa-circle-o-notch fa-spin"></i>',
@@ -113,6 +115,7 @@ return [
         'created' => '<i class="fa fa-check fa-lg"></i> Запись успешно создана',
         'updated' => '<i class="fa fa-check fa-lg"></i> Запись успешно обновлена',
         'deleted' => '<i class="fa fa-check fa-lg"></i> Запись успешно удалена',
+        'duplicated' => '<i class="fa fa-check fa-lg"></i> Запись :id успешно дублирована',
         'restored' => '<i class="fa fa-check fa-lg"></i> Запись успешно восстановлена',
         'something_went_wrong' => 'Что-то пошло не так!',
         'are_you_sure' => 'Вы уверены?',

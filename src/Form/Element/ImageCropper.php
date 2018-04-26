@@ -10,7 +10,7 @@
 		/**
 		 * @var string
 		 */
-		protected static $route = 'image';
+		protected static $route = 'image-cropper';
 
 		/**
 		 * @var \Closure
@@ -31,7 +31,21 @@
 		/**
 		 * @var string
 		 */
-		protected $view = 'admin.elements.image_cropper';
+		protected $view = 'form.element.image_cropper';
+
+		protected $width;
+
+		protected $height;
+
+		protected $data_url = false;
+
+		public function __construct($path, $label = null, $model, $data_url = false)
+		{
+			$this->width = config($model . '_image_width');
+			$this->height = config($model . '_image_height');
+			if($data_url) $this->data_url = true;
+			parent::__construct($path, $label);
+		}
 
 		/**
 		 * @param Validator $validator
@@ -59,15 +73,6 @@
 			$this->saveCallback = $callable;
 
 			return $this;
-		}
-
-		public function render()
-		{
-			return view(
-				$this->getView(),
-				$this->toArray()
-			);
-
 		}
 
 		/**
@@ -115,19 +120,40 @@
 			if (is_callable($callback = $this->getSaveCallback())) {
 				return $callback($file, $path, $filename, $settings);
 			}
-
-			$value = $path . '/' . $filename;
-
+			$tmp_name = time();
+			$value = $path . '/' . $tmp_name . '.' . $file->extension();
+			$value_o = $path . '/' . $tmp_name . '_o.' . $file->extension();
+			$value_s = $path . '/' . $tmp_name . '_s.' . $file->extension();
+			$value_s_o = $path . '/' . $tmp_name . '_s_o.' . $file->extension();
 			if (class_exists('Intervention\Image\Facades\Image') and (bool)getimagesize($file->getRealPath())) {
 				$image = \Intervention\Image\Facades\Image::make($file);
+				$image->resize(2000, 2000, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				});
 				foreach ($settings as $method => $args) {
 					call_user_func_array([$image, $method], $args);
 				}
-				$image->save($value);
-
+				$image->save($value_o, 85);
+				$image_s = clone $image;
+				$image_s = $this->resizeImage($image_s, $this->width, $this->height);
+				$image_s->save($value_s_o, 85);
+				$image->save($value,85);
+				$image_s->save($value_s, 85);
 			}
 
-			return ['path' => asset($value), 'value' => $value];
+			return ['path'      => $value,
+					'value'     => $value,
+					'value_o'   => $value_o,
+					'value_s'   => $value_s,
+					'value_s_o' => $value_s_o];
+		}
+
+		public function resizeImage(\Intervention\Image\Image $image, $x, $y)
+		{
+			return $image->fit($x, $y, function ($constraint) {
+				$constraint->aspectRatio();
+			});
 		}
 
 		/**
@@ -138,11 +164,6 @@
 		public function defaultUploadPath(UploadedFile $file)
 		{
 			return config('sleeping_owl.imagesUploadDirectory', 'images/uploads');
-		}
-
-		public function cropperTemplate($data)
-		{
-			return ['cropper' => view('admin.elements.cropper', $data)->render()];
 		}
 
 		/**
@@ -157,4 +178,38 @@
 				return $callback($value, $model);
 			}
 		}
+
+		/**
+		 * @return array
+		 */
+		public function toArray()
+		{
+			$this->setHtmlAttributes([
+				'id'   => $this->getName(),
+				'name' => $this->getName(),
+			]);
+
+			return array_merge(parent::toArray(), [
+				'id'         => $this->getName(),
+				'value'      => $this->getValueFromModel(),
+				'name'       => $this->getName(),
+				'width'      => $this->width,
+				'height'     => $this->height,
+				'data_url'   => $this->data_url,
+				'path'       => $this->getPath(),
+				'label'      => $this->getLabel(),
+				'attributes' => $this->htmlAttributesToString(),
+				'helpText'   => $this->getHelpText(),
+				'required'   => in_array('required', $this->validationRules),
+			]);
+		}
+
+		public function render()
+		{
+			return app('sleeping_owl.template')->view(
+				$this->getView(),
+				$this->toArray()
+			);
+		}
+
 	}

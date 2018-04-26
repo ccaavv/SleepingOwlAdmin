@@ -16,6 +16,7 @@ return [
     'model' => [
         'create' => '创建 :title',
         'edit' => '更新 :title',
+        'view' => '更新 :title',
     ],
     'links' => [
         'index_page' => '网站首页',

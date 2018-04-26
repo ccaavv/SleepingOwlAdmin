@@ -18,6 +18,14 @@ class SectionModelConfiguration extends ModelConfigurationManager
         return method_exists($this, 'onCreate') && parent::isCreatable($this->getModel());
     }
 
+	/**
+	 * @return bool
+	 */
+	public function isDuplicatable()
+	{
+		return method_exists($this, 'onDuplicate') && parent::isCreatable($this->getModel());
+	}
+
     /**
      * @param \Illuminate\Database\Eloquent\Model $model
      *
@@ -99,6 +107,35 @@ class SectionModelConfiguration extends ModelConfigurationManager
         if ($form instanceof FormInterface) {
             $form->setAction($this->getUpdateUrl($id));
             $form->setId($id);
+        }
+
+        return $form;
+    }
+
+    /**
+     * @param $id
+     *
+     * @return mixed|void
+     */
+    public function fireView($id)
+    {
+        if (! method_exists($this, 'onEdit')) {
+            return;
+        }
+
+        $form = $this->app->call([$this, 'onEdit'], ['id' => $id]);
+        if ($form instanceof DisplayInterface) {
+            $form->setModelClass($this->getClass());
+        }
+
+        if ($form instanceof Initializable) {
+            $form->initialize();
+        }
+
+        if ($form instanceof FormInterface) {
+            $form->setAction('');
+			$form->setDisabled(true);
+			$form->setId($id);
         }
 
         return $form;

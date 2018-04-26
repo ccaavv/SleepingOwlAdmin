@@ -3,7 +3,7 @@
 namespace SleepingOwl\Admin\Form\Buttons;
 
 /**
- * Class Save.
+ * Class Delete.
  */
 class Delete extends FormButton
 {
@@ -26,7 +26,7 @@ class Delete extends FormButton
             'name'          => 'next_action',
             'class'         => 'btn btn-danger btn-delete',
             'data-url'      => $this->getModelConfiguration()->getDeleteUrl($this->getModel()->getKey()),
-            'data-redirect' => $this->getModelConfiguration()->getDisplayUrl(),
+            'data-redirect' => $this->getModelConfiguration()->getCancelUrl(),
         ]);
     }
 

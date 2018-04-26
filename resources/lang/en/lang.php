@@ -16,6 +16,7 @@ return [
     'model' => [
         'create' => 'Create record in section :title',
         'edit' => 'Update record in section :title',
+        'view' => 'View record in section :title',
     ],
     'links' => [
         'index_page' => 'To site',
