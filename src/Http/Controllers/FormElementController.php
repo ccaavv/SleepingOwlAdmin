@@ -53,7 +53,7 @@ class FormElementController extends Controller
         $options = $element->getOptions();
 
         if ($element->isNullable()) {
-            $options = [null => trans('sleeping_owl::lang.select.nothing')] + $options;
+            $options = ["" => trans('sleeping_owl::lang.select.nothing')] + $options;
         }
 
         return new JsonResponse([

@@ -65,7 +65,12 @@ class Select extends NamedFormElement
             asort($options);
         }
 
-        return $options;
+		if ($this->isNullable()) {
+			$this->setHtmlAttribute('data-nullable', 'true');
+			$options = [null => trans('sleeping_owl::lang.select.nothing')] + $options;
+		}
+
+		return $options;
     }
 
     /**
@@ -172,15 +177,8 @@ class Select extends NamedFormElement
             $this->setHtmlAttribute('disabled', 'disabled');
         }
 
-        $options = $this->getOptions();
-
-        if ($this->isNullable()) {
-            $this->setHtmlAttribute('data-nullable', 'true');
-            $options = [null => trans('sleeping_owl::lang.select.nothing')] + $options;
-        }
-
         return ['attributes' => $this->getHtmlAttributes()] + parent::toArray() + [
-                'options'  => $options,
+                'options'  => $this->getOptions(),
                 'nullable' => $this->isNullable(),
             ];
     }

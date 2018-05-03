@@ -187,14 +187,14 @@
         },
         getSelect: function (data, placeholder, defVal) {
             var self = this, $select = $("<select>"), idParam = self.idParam, nameParam = self.nameParam, options;
-            if (placeholder !== false) {
-                createOption($select, "", placeholder, defVal);
-            }
+            // if (placeholder !== false) {
+            //     createOption($select, "", placeholder, defVal);
+            // }
             if (isEmpty(data)) {
                 data = {};
             }
             $.each(data, function (i, groups) {
-                if (groups[idParam]) {
+                if (groups[idParam] !== undefined) {
                     options = groups[self.optionsParam] || {};
                     createOption($select, groups[idParam], groups[nameParam], defVal, options);
                 }

@@ -9,6 +9,6 @@
 
 		public function can($action, \Illuminate\Database\Eloquent\Model $model)
 		{
-			return auth()->guard('admin')->user()->hasAccess($this->alias . '.' . $action);
+			return checkAdminAccess($this->alias . '.' . $action);
 		}
 	}
