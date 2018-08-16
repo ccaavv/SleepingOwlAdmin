@@ -1,3 +1,5 @@
+import Cropper from './../../libs/cropper';
+
 Vue.component('element-image-cropper', Vue.extend({
 	props: {
 		url: {
@@ -31,7 +33,7 @@ Vue.component('element-image-cropper', Vue.extend({
 			default: false
 		},
 	},
-	data () {
+	data() {
 		return {
 			errors: [],
 			uploading: false,
@@ -42,27 +44,28 @@ Vue.component('element-image-cropper', Vue.extend({
 			val: false,
 		}
 	},
-	mounted () {
+	mounted() {
 		this.val = this.value;
-		this.initUpload()
+		Cropper.noConflict();
+		this.initModalListener();
+		this.initUpload();
 	},
 	methods: {
-		initUpload () {
+		initUpload() {
 			let self = this,
 				container = $(self.$el.parentNode),
 				button = container.find('.upload-button');
-
-			if(self.dataurl === true) {
+			if (self.dataurl === true) {
 				button.dropzone({
 					url: this.url,
 					uploadMultiple: false,
 					previewsContainer: false,
 					acceptedFiles: 'image/*',
 					dictDefaultMessage: '',
-					thumbnailWidth: 300,
+					thumbnailWidth: null,
 					thumbnailHeight: 300,
-					thumbnailMethod: 'cover',
-					thumbnail: function(file, dataUrl) {
+					thumbnailMethod: 'contain',
+					thumbnail: function (file, dataUrl) {
 						self.val = dataUrl;
 						self.initCrop();
 					}
@@ -75,14 +78,14 @@ Vue.component('element-image-cropper', Vue.extend({
 					previewsContainer: false,
 					acceptedFiles: 'image/*',
 					dictDefaultMessage: '',
-					sending () {
+					sending() {
 						self.uploading = true;
 						self.closeAlert()
 					},
-					success (file, response) {
+					success(file, response) {
 						self.val = response.value_s;
 					},
-					error (file, response) {
+					error(file, response) {
 						if (_.isArray(response.errors)) {
 							self.$set(self.errors, response.errors);
 						}
@@ -93,78 +96,99 @@ Vue.component('element-image-cropper', Vue.extend({
 				});
 			}
 		},
-		initCrop () {
+		initCrop() {
 			let self = this,
 				container = $(self.$el.parentNode),
-				cropper_modal = container.find('.modal');
-			_image = cropper_modal.find('img');
+				cropper_modal = container.find('.modal'),
+				_image = cropper_modal.find('img');
 			cropper_modal.modal('toggle');
+		},
+		initModalListener() {
+			let self = this,
+				container = $(self.$el.parentNode),
+				cropper_modal = container.find('.modal'),
+				_image = cropper_modal.find('img');
 			cropper_modal.on('shown.bs.modal', function () {
-				self.cropper = _image.cropper({
+				self.cropper = new Cropper(_image[0], {
+					viewMode: 0,
 					aspectRatio: parseInt(self.width) / parseInt(self.height),
-					minCanvasWidth: parseInt(self.width),
-					minCanvasHeight: parseInt(self.height),
+					// minCanvasWidth: parseInt(self.width),
+					// minCanvasHeight: parseInt(self.height),
 				});
 			}).on('hidden.bs.modal', function () {
-				self.cropper.cropper('destroy');
+				self.cropper.destroy();
+				self.cropper = {};
+				$('.cropper-container').remove();
+				cropper_modal.find('img.cropper-hidden').removeClass('cropper-hidden');
 			});
 		},
-		setDragMode (value) {
+		setDragMode(value) {
 			let self = this;
-			self.cropper.cropper('setDragMode', value);
+			self.cropper.setDragMode(value);
 		},
-		zoom (value) {
+		zoom(value) {
 			let self = this;
-			self.cropper.cropper('zoom', value);
+			self.cropper.zoom(value);
 		},
-		move (left, top) {
+		move(left, top) {
 			let self = this;
-			self.cropper.cropper('move', left, top);
+			self.cropper.move(left, top);
 		},
-		rotate (degree) {
+		rotate(degree) {
 			let self = this;
-			self.cropper.cropper('rotate', degree);
+			self.cropper.rotate(degree);
 		},
-		scaleX () {
+		scaleX() {
 			let self = this;
-			self.cropper.cropper('scaleX', (self.scale_x * -1));
+			self.cropper.scaleX((self.scale_x * -1));
 			self.scale_x = (self.scale_x * -1);
 		},
-		scaleY () {
+		scaleY() {
 			let self = this;
-			self.cropper.cropper('scaleY', (self.scale_y * -1));
+			self.cropper.scaleY((self.scale_y * -1));
 			self.scale_y = (self.scale_y * -1);
 		},
-		reset () {
+		reset() {
 			let self = this;
-			self.cropper.cropper('reset');
+			self.cropper.reset();
 		},
-		clear () {
+		clear() {
 			let self = this;
-			self.cropper.cropper('clear');
+			self.cropper.clear();
 		},
-		crop () {
+		crop() {
 			let self = this;
-			if(self.dataurl === true) {
-				self.val = self.cropper.cropper('getCroppedCanvas', {width: self.width, height: self.height}).toDataURL('image/jpeg');
+			if (self.dataurl === true) {
+				self.val = self.cropper.getCroppedCanvas({
+					width: self.width,
+					height: self.height,
+					imageSmoothingEnabled: true,
+					imageSmoothingQuality: 'high',
+					fillColor: '#fff'
+				}).toDataURL('image/jpeg');
 				$(self.$el.parentNode).find('.modal').modal('toggle');
 			} else {
-				self.cropper.cropper('getCroppedCanvas', {width: self.width, height: self.height}).toBlob(function (blob) {
+				self.cropper.getCroppedCanvas({
+					width: self.width,
+					height: self.height,
+					imageSmoothingEnabled: true,
+					imageSmoothingQuality: 'high',
+					fillColor: '#fff'
+				}).toBlob(function (blob) {
 					let formData = new FormData();
 					formData.append('croppedImage', blob);
 					formData.append('_token', Admin.token);
 					formData.append('image_path', self.val);
 					formData.append('model', self.model);
-
 					$.ajax('/admin/renew-image', {
 						method: "POST",
 						data: formData,
 						processData: false,
 						contentType: false,
 						success: function (response) {
-							if(response.value) {
-								self.val = response.value;
+							if (response.value) {
 								self.now = Date.now();
+								self.val = response.value;
 							}
 							$(self.$el.parentNode).find('.modal').modal('toggle');
 						},
@@ -175,13 +199,13 @@ Vue.component('element-image-cropper', Vue.extend({
 				});
 			}
 		},
-		remove () {
+		remove() {
 			let self = this;
 			Admin.Messages.confirm(trans('lang.message.are_you_sure')).then(() => {
 				self.val = false;
 			});
 		},
-		closeAlert () {
+		closeAlert() {
 			this.$set(this.errors, []);
 		}
 	},
@@ -192,20 +216,20 @@ Vue.component('element-image-cropper', Vue.extend({
 			}
 			return 'fa fa-spinner fa-spin'
 		},
-		has_value () {
+		has_value() {
 			return this.val.length > 0
 		},
-		is_default () {
+		is_default() {
 			return this.val.search('default') > 0;
 		},
-		image () {
+		image() {
 			return (typeof this.val === 'string' && this.val.length > 0)
 				? (this.dataurl === true)
 					? this.val
 					: Admin.Url.app(this.val + '?' + this.now)
 				: Admin.Url.upload(this.val);
 		},
-		image_crop () {
+		image_crop() {
 			return this.image.replace('_s.', '_o.')
 		},
 	}

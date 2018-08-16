@@ -134,12 +134,12 @@
 				foreach ($settings as $method => $args) {
 					call_user_func_array([$image, $method], $args);
 				}
-				$image->save($value_o, 85);
+				$image->save($value_o, 100);
 				$image_s = clone $image;
 				$image_s = $this->resizeImage($image_s, $this->width, $this->height);
-				$image_s->save($value_s_o, 85);
-				$image->save($value,85);
-				$image_s->save($value_s, 85);
+				$image_s->save($value_s_o, 100);
+				$image->save($value,100);
+				$image_s->save($value_s, 100);
 			}
 
 			return ['path'      => $value,
@@ -151,7 +151,7 @@
 
 		public function resizeImage(\Intervention\Image\Image $image, $x, $y)
 		{
-			return $image->fit($x, $y, function ($constraint) {
+			return $image->resize($x, $y, function ($constraint) {
 				$constraint->aspectRatio();
 			});
 		}

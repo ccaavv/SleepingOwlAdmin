@@ -1,5 +1,6 @@
 import Admin from './components/admin';
 
+
 window._ = require('lodash');
 
 window.Admin = new Admin(
@@ -25,7 +26,6 @@ require('./libs/metismenu')
 require('./libs/nestable')
 require('./libs/sweetalert')
 require('./libs/dependent-dropdown')
-require('cropper')
 
 require('./libs/vuejs')
 /**

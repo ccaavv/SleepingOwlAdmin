@@ -90,7 +90,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-xs btn-default" data-dismiss="modal">Закрыть</button>
+				<button type="button" class="btn btn-xs btn-default" data-dismiss="modal" aria-label="Close">Закрыть</button>
 			</div>
 		</div>
 	</div>

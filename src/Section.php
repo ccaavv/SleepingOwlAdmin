@@ -6,7 +6,6 @@
 
 	class Section extends SectionModelConfiguration
 	{
-
 		public function can($action, \Illuminate\Database\Eloquent\Model $model)
 		{
 			return checkAdminAccess($this->alias . '.' . $action);
