@@ -302,6 +302,7 @@
 						->with([
 							'_redirectBack'       => $backUrl,
 							'sleeping_owl_tab_id' => $request->get('sleeping_owl_tab_id') ?: null,
+							'error_message' => trans('sleeping_owl::lang.message.validation_error'),
 						]);
 				}
 			}
