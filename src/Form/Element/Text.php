@@ -18,4 +18,11 @@ class Text extends NamedFormElement
      * @var string
      */
     protected $view = 'form.element.text';
+
+	public function min($min, $message = null)
+	{
+		$this->addValidationRule('min:' . $min, $message);
+
+		return $this;
+	}
 }
