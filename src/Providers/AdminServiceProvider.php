@@ -169,7 +169,7 @@ class AdminServiceProvider extends ServiceProvider
             });
 
         foreach ($files as $file) {
-            require $file;
+            require_once $file;
         }
     }
 
