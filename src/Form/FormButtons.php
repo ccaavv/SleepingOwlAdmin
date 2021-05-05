@@ -152,6 +152,20 @@
 			return $this;
 		}
 
+        /**
+         * @param array $aliases
+         * @return void
+         */
+        public function filterButtons($aliases)
+        {
+            $aliases = array_flip($aliases);
+            foreach ($this->buttons as $key => $value) {
+                if (!isset($aliases[$key])) {
+                    unset($this->buttons[$key]);
+                }
+            }
+        }
+
 		/**
 		 * @param $buttons
 		 * @return $this

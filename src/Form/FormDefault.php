@@ -416,12 +416,19 @@
 			$this->setHtmlAttribute('method', 'POST');
 			$this->setHtmlAttribute('action', $this->getAction());
 
+			if ($this->disabled === true) {
+                $this->getButtons()->filterButtons([
+                    'duplicate',
+                    'cancel',
+                ]);
+            }
+
 			return [
 				'items'      => $this->getElements()->onlyVisible(),
 				'instance'   => $this->getModel(),
 				'attributes' => $this->htmlAttributesToString(),
 				'disabled' => $this->getDisabled(),
-				'buttons'    => ($this->disabled === true) ? null : $this->getButtons(),
+				'buttons'    => $this->getButtons(),
 				'backUrl'    => session('_redirectBack', \URL::previous()),
 			];
 		}
